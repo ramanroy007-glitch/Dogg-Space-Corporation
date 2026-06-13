@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Prevent read-only Window fetch errors from automated environments -->
+  <script>
+    (function() {
+      try {
+        let currentFetch = window.fetch;
+        Object.defineProperty(window, 'fetch', {
+          get() { return currentFetch; },
+          set(value) { currentFetch = value; },
+          configurable: true,
+          enumerable: true
+        });
+      } catch (e) {
+        console.warn("Fetch shim bypass:", e);
+      }
+    })();
+  </script>
+  <!-- Only index.html is indexable -->
+  <meta name="robots" content="index,follow">
+  <link rel="canonical" href="https://doggspace.com">
+  <title>DoggSpace | Premium Rewards, Verified Offers & Ultimate Experiences</title>
+  <meta name="description" content="Join 47,000+ members who receive verified product samples, handpicked brand testing invitations, and top affiliate sweepstakes every week. 100% free. No credit card required.">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://doggspace.com">
+  <meta property="og:title" content="DoggSpace | Premium Rewards, Verified Offers & Ultimate Experiences">
+  <meta property="og:description" content="Discover hand-curated digital rewards, high-performance affiliate offers, and free shipping samples on the smartest rewards catalog.">
+  <meta property="og:image" content="/public/og-image.svg">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* DESIGN SYSTEM DESIGN TOKENS */
+    :root {
+      --bg: #040914;          /* deepest space background */
+      --surface: #0B1220;     /* card backgrounds */
+      --surface2: #111C30;    /* elevated surfaces */
+      --gold: #F5A623;        /* primary accent */
+      --gold-dark: #C47F10;   /* gold hover states */
+      --white: #F0F6FF;       /* primary text */
+      --muted: rgba(240, 246, 255, 0.52); /* secondary text */
+      --subtle: rgba(255, 255, 255, 0.06); /* borders/dividers */
+      --green: #10B981;       /* success states, indicators */
+      --purple: #8B5CF6;      /* tier 2 accent */
+      --radius: 14px;
+      --radius-lg: 22px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--white);
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* Ambient particles container */
+    #particles-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 750px;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Top Sticky Navigation */
+    nav {
+      position: sticky;
+      top: 0;
+      width: 100%;
+      height: 70px;
+      background: rgba(4, 9, 20, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 2rem;
+      z-index: 100;
+    }
+
+    .logo {
+      font-family: 'Sora', sans-serif;
+      font-weight: 800;
+      font-size: 1.5rem;
+      color: var(--white);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .logo span {
+      color: var(--gold);
+    }
+
+    .nav-status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .green-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--green);
+      border-radius: 50%;
+      animation: dotPulse 1.8s infinite;
+    }
+
+    @keyframes dotPulse {
+      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    /* Hero Layout Above The Fold */
+    .hero-container {
+      position: relative;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+      display: grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      gap: 3rem;
+      align-items: center;
+      z-index: 10;
+    }
+
+    @media (max-width: 968px) {
+      .hero-container {
+        grid-template-columns: 1fr;
+        padding: 2rem 1.5rem;
+        gap: 2rem;
+      }
+    }
+
+    .hero-left {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .eyebrow-tag {
+      align-self: flex-start;
+      background: rgba(245, 166, 35, 0.1);
+      border: 1px solid rgba(245, 166, 35, 0.25);
+      color: var(--gold);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 0.4rem 1rem;
+      border-radius: 99px;
+    }
+
+    /* Animated headline styles */
+    h1 {
+      font-family: 'Sora', sans-serif;
+      font-size: 2.75rem;
+      font-weight: 800;
+      line-height: 1.2;
+      color: var(--white);
+    }
+
+    h1 span.gold-text {
+      color: var(--gold);
+    }
+
+    .word-wrapper {
+      display: inline-block;
+      overflow: hidden;
+      vertical-align: bottom;
+    }
+
+    .anim-word {
+      display: inline-block;
+      transform: translateY(110%);
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 2.1rem;
+      }
+    }
+
+    .sub-head {
+      font-size: 1.15rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* Overlapping social proof avatar circle row */
+    .social-proof-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--white);
+    }
+
+    .avatar-stack {
+      display: flex;
+    }
+
+    .avatar-stack .avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 2px solid var(--bg);
+      margin-left: -10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+
+    .avatar-stack .avatar:first-child {
+      margin-left: 0;
+    }
+
+    /* Squeeze Form Card with Pulsing glow colors */
+    .form-card {
+      background: var(--surface);
+      border: 1px solid rgba(245, 166, 35, 0.2);
+      border-radius: var(--radius-lg);
+      padding: 2.25rem;
+      max-width: 485px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      position: relative;
+      animation: goldGlowPulse 5s infinite ease-in-out;
+    }
+
+    @keyframes goldGlowPulse {
+      0%, 100% { box-shadow: 0 10px 30px -15px rgba(245, 166, 35, 0.15); }
+      50% { box-shadow: 0 10px 35px -10px rgba(245, 166, 35, 0.35); }
+    }
+
+    .form-header h2 {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.35rem;
+      color: var(--white);
+      margin-bottom: 0.4rem;
+    }
+
+    .form-header p {
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .input-label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .input-field {
+      background: var(--surface2);
+      border: 1px solid var(--subtle);
+      color: var(--white);
+      padding: 0.85rem 1rem;
+      font-family: inherit;
+      font-size: 0.95rem;
+      border-radius: var(--radius);
+      outline: none;
+      transition: border 0.25s, box-shadow 0.25s;
+    }
+
+    .input-field:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 2px rgba(245, 166, 35, 0.15);
+    }
+
+    .checkbox-container {
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+      cursor: pointer;
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.5;
+      user-select: none;
+    }
+
+    .checkbox-container input {
+      display: none;
+    }
+
+    .custom-checkbox {
+      width: 18px;
+      height: 18px;
+      border: 1.5px solid var(--muted);
+      border-radius: 4px;
+      flex-shrink: 0;
+      position: relative;
+      transition: all 0.2s;
+      margin-top: 2px;
+    }
+
+    .checkbox-container input:checked + .custom-checkbox {
+      background: var(--gold);
+      border-color: var(--gold);
+    }
+
+    .checkbox-container input:checked + .custom-checkbox::after {
+      content: "✓";
+      color: var(--bg);
+      font-weight: 800;
+      font-size: 11px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    /* CTA button */
+    .cta-button {
+      background: var(--gold);
+      color: var(--bg);
+      font-family: 'Sora', sans-serif;
+      font-weight: 700;
+      font-size: 1.05rem;
+      border: none;
+      padding: 1.1rem 1.5rem;
+      border-radius: var(--radius);
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .cta-button:hover {
+      background: var(--gold-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(245, 166, 35, 0.25);
+    }
+
+    .cta-button::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.2) 50%,
+        rgba(255, 255, 255, 0) 100%
+      );
+      transform: rotate(30deg);
+      animation: buttonShimmer 5s infinite linear;
+    }
+
+    @keyframes buttonShimmer {
+      0% { transform: translate(-30%, -30%) rotate(30deg); }
+      100% { transform: translate(30%, 30%) rotate(30deg); }
+    }
+
+    .cta-button:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .micro-copy {
+      font-size: 0.74rem;
+      color: var(--muted);
+      line-height: 1.4;
+      text-align: center;
+    }
+
+    .micro-copy a {
+      color: var(--gold);
+      text-decoration: underline;
+    }
+
+    .error-box {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1.5px solid #EF4444;
+      color: #F87171;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius);
+      font-size: 0.82rem;
+      display: none;
+    }
+
+    /* RIGHT SIDE - CSS Cardboard box animation with sparkles */
+    .hero-right {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    .box-animation-wrapper {
+      position: relative;
+      width: 320px;
+      height: 320px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    @media (max-width: 968px) {
+      .box-animation-wrapper {
+        width: 220px;
+        height: 220px;
+      }
+    }
+
+    .box-sparkle {
+      position: absolute;
+      font-size: 1.5rem;
+      color: var(--gold);
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    /* 3D Box in pure CSS */
+    .gift-box {
+      position: relative;
+      width: 140px;
+      height: 140px;
+      transform-style: preserve-3d;
+      transform: rotateX(-15deg) rotateY(45deg);
+      animation: boxFloat 4s infinite ease-in-out;
+    }
+
+    @keyframes boxFloat {
+      0%, 100% { transform: rotateX(-15deg) rotateY(45deg) translateY(0px); }
+      50% { transform: rotateX(-15deg) rotateY(45deg) translateY(-14px); }
+    }
+
+    .box-face {
+      position: absolute;
+      width: 140px;
+      height: 140px;
+      background: #8e583c;
+      border: 2.5px solid #5d3a27;
+    }
+
+    .box-front  { transform: rotateY(0deg) translateZ(70px); }
+    .box-back   { transform: rotateY(180deg) translateZ(70px); background: #7c4c33; }
+    .box-left   { transform: rotateY(-90deg) translateZ(70px); background: #71452e; }
+    .box-right  { transform: rotateY(90deg) translateZ(70px); background: #814f35; }
+    .box-bottom { transform: rotateX(-90deg) translateZ(70px); background: #5d3a27; }
+
+    /* Openable Lid */
+    .box-lid {
+      position: absolute;
+      width: 150px;
+      height: 35px;
+      background: #9d6445;
+      border: 2px solid #5d3a27;
+      top: -15px;
+      left: -5px;
+      transform-style: preserve-3d;
+      transform: translateZ(75px) rotateX(0deg);
+      transform-origin: left top;
+      transition: transform 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    /* Ribbon element */
+    .ribbon-v {
+      position: absolute;
+      left: 60px;
+      width: 20px;
+      height: 100%;
+      background: var(--gold);
+    }
+
+    .ribbon-h {
+      position: absolute;
+      top: 60px;
+      width: 100%;
+      height: 20px;
+      background: var(--gold);
+    }
+
+    /* Auto-scrolling brand loop marquee */
+    .marquee-container {
+      background: rgba(11, 24, 40, 0.5);
+      border-top: 1px solid var(--subtle);
+      border-bottom: 1px solid var(--subtle);
+      padding: 1.5rem 0;
+      overflow: hidden;
+      width: 100%;
+      white-space: nowrap;
+    }
+
+    .marquee-track {
+      display: inline-block;
+      animation: marqueeScroll 25s infinite linear;
+    }
+
+    .marquee-word {
+      display: inline-block;
+      color: var(--muted);
+      font-family: 'Sora', sans-serif;
+      font-weight: 800;
+      font-size: 1.4rem;
+      margin: 0 3rem;
+      letter-spacing: 2px;
+    }
+
+    @keyframes marqueeScroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* Section Grid */
+    .section-title-box {
+      text-align: center;
+      padding: 5rem 2rem 2.5rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .section-title-box h3 {
+      font-family: 'Sora', sans-serif;
+      font-size: 2.2rem;
+      color: var(--white);
+    }
+
+    .section-title-box p {
+      color: var(--muted);
+      font-size: 1.1rem;
+      margin-top: 0.5rem;
+    }
+
+    .feature-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem 5rem;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+    }
+
+    @media (max-width: 850px) {
+      .feature-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .reveal-card {
+      background: var(--surface);
+      border: 1px solid var(--subtle);
+      border-radius: var(--radius);
+      padding: 2.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.65s ease-out;
+    }
+
+    .reveal-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-card:hover {
+      border-color: rgba(245, 166, 35, 0.15);
+      transform: translateY(-5px);
+    }
+
+    .card-icon {
+      font-size: 2.5rem;
+    }
+
+    .card-title {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.25rem;
+      color: var(--white);
+    }
+
+    .card-body {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.55;
+    }
+
+    /* Testimonials Screen Section */
+    .testimonial-section {
+      background: rgba(11, 24, 40, 0.3);
+      padding: 5rem 2rem;
+    }
+
+    .testimonial-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+    }
+
+    @media (max-width: 850px) {
+      .testimonial-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .testimonial-card {
+      background: var(--surface);
+      border: 1px solid var(--subtle);
+      border-radius: var(--radius);
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      position: relative;
+    }
+
+    .testimonial-stars {
+      color: var(--gold);
+      font-size: 0.95rem;
+    }
+
+    .testimonial-text {
+      color: var(--white);
+      font-size: 0.96rem;
+      font-style: italic;
+      line-height: 1.5;
+    }
+
+    .testimonial-user {
+      font-size: 0.85rem;
+      color: var(--gold);
+      font-weight: 700;
+    }
+
+    /* How It Works */
+    .how-it-works-section {
+      padding: 5rem 2rem;
+    }
+
+    .steps-container {
+      max-width: 1000px;
+      margin: 3rem auto 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3rem;
+      position: relative;
+    }
+
+    @media (max-width: 800px) {
+      .steps-container {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+      }
+    }
+
+    .step-card {
+      background: var(--surface2);
+      border: 1px solid var(--subtle);
+      border-radius: var(--radius);
+      padding: 2rem;
+      text-align: center;
+      position: relative;
+      z-index: 5;
+    }
+
+    .step-number {
+      width: 44px;
+      height: 44px;
+      background: var(--gold);
+      color: var(--bg);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Sora', sans-serif;
+      font-weight: 800;
+      font-size: 1.15rem;
+      margin: -3.2rem auto 1.5rem auto;
+      border: 4px solid var(--bg);
+    }
+
+    .step-title {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.125rem;
+      color: var(--white);
+      margin-bottom: 0.5rem;
+    }
+
+    .step-desc {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    /* Second Opt-In Button */
+    .second-opt-in-box {
+      max-width: 750px;
+      margin: 5rem auto;
+      padding: 3rem 2rem;
+      background: var(--surface);
+      border: 1px solid rgba(245, 166, 35, 0.15);
+      border-radius: var(--radius-lg);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .link-form-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      width: 100%;
+      max-width: 460px;
+    }
+
+    /* Compliance Footer */
+    footer {
+      background: #02050c;
+      border-top: 1px solid var(--subtle);
+      padding: 4rem 2rem 2.5rem;
+      font-size: 0.76rem;
+      color: var(--muted);
+    }
+
+    .footer-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3rem;
+      margin-bottom: 3rem;
+    }
+
+    @media (max-width: 850px) {
+      .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+    }
+
+    .footer-col {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      line-height: 1.6;
+    }
+
+    .footer-col-title {
+      color: var(--white);
+      font-family: 'Sora', sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+    }
+
+    .footer-links a {
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--gold);
+      text-decoration: underline;
+    }
+
+    .bottom-copyright-strip {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-top: 2rem;
+      border-top: 1px solid var(--subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    /* GSAP success overlay */
+    #gsap-success-overlay {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 1rem 0;
+      opacity: 0;
+    }
+
+    .success-icon-wrap {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: rgba(16, 185, 129, 0.1);
+      border: 2px solid var(--green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--green);
+      font-size: 2.2rem;
+      margin-bottom: 1rem;
+      animation: checkPulse 2s infinite;
+    }
+
+    @keyframes checkPulse {
+      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+  </style>
+
+  <!-- GSAP Core Animations library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <!-- canvas-confetti library for interactive success explosions -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+
+  <!-- Ambient Particles Screen background overlay -->
+  <canvas id="particles-canvas"></canvas>
+
+  <!-- Sticky Top Nav -->
+  <nav>
+    <a href="/" class="logo">
+      <span>Dogg</span>Space
+    </a>
+    <div class="nav-status">
+      <div class="green-dot"></div>
+      🔒 Strictly Safe &middot; One-Click opt-out
+    </div>
+  </nav>
+
+  <!-- Main Hero Layout Container -->
+  <main class="hero-container">
+    
+    <!-- Hero Left - Slogan, Social Proof, and main card form -->
+    <div class="hero-left">
+      <div class="eyebrow-tag">🎖️ Members-Only Digital Rewards</div>
+      
+      <!-- Headline animate word by word -->
+      <h1 id="headline">
+        <span class="word-wrapper"><span class="anim-word">The</span></span> 
+        <span class="word-wrapper"><span class="anim-word">smartest</span></span> 
+        <span class="word-wrapper"><span class="anim-word">consumers</span></span> <br>
+        <span class="word-wrapper"><span class="anim-word gold-text">claim</span></span> 
+        <span class="word-wrapper"><span class="anim-word gold-text">premium</span></span> 
+        <span class="word-wrapper"><span class="anim-word gold-text">rewards</span></span> 
+        <span class="word-wrapper"><span class="anim-word">on</span></span> 
+        <span class="word-wrapper"><span class="anim-word">Dogg</span></span> 
+        <span class="word-wrapper"><span class="anim-word gold-text">Space.</span></span>
+      </h1>
+
+      <p class="sub-head">
+        Join over 47,000+ members who receive premium product testing bundles, handpicked reward invitations, and direct-ship freebies. No credit cards, no hidden traps, 100% fair.
+      </p>
+
+      <div class="social-proof-row">
+        <div class="avatar-stack">
+          <div class="avatar" style="background:#f43f5e; color:#fff">S</div>
+          <div class="avatar" style="background:#3b82f6; color:#fff">J</div>
+          <div class="avatar" style="background:#10b981; color:#fff">L</div>
+          <div class="avatar" style="background:#af10b9; color:#fff">N</div>
+          <div class="avatar" style="background:#f59e0b; color:#fff">W</div>
+        </div>
+        <div>
+          <strong><span id="member-counter">47,284</span> shoppers</strong> joined this month ★★★★★ 4.95/5
+        </div>
+      </div>
+
+      <!-- Squeeze optin card -->
+      <div class="form-card" id="squeeze-form-card">
+        <div id="form-header-title">
+          <h2>Secure Your Rewards Access</h2>
+        </div>
+        <p id="form-sub-header" style="font-size: 0.88rem; color: var(--muted); margin-bottom: 0.2rem;">
+          Matches are scanned in real-time. Unlocks instantly upon email confirmation.
+        </p>
+
+        <!-- Form fields and elements -->
+        <form id="subscribe-form" style="display: flex; flex-direction: column; gap: 1.1rem;">
+          <div class="error-box" id="error-message"></div>
+
+          <div class="input-group">
+            <label class="input-label" for="fullName">First Name</label>
+            <input type="text" id="fullName" class="input-field" placeholder="e.g. Rachel" required autocomplete="given-name">
+          </div>
+
+          <div class="input-group">
+            <label class="input-label" for="email">Email Address</label>
+            <input type="email" id="email" class="input-field" placeholder="e.g. rachel@domain.com" required autocomplete="email">
+          </div>
+
+          <label class="checkbox-container">
+            <input type="checkbox" id="consent-check" required>
+            <span class="custom-checkbox"></span>
+            I agree to receive verified promotional matches and reward alerts from DoggSpace. I understand I can unsubscribe in one click anytime.
+          </label>
+
+          <button type="submit" class="cta-button" id="submit-btn">
+            Get My Verified Rewards →
+          </button>
+        </form>
+
+        <p class="micro-copy" id="form-info-terms">
+          We process leads ethically. We receive referral commissions when you complete third-party offers — making your final rewards entirely free. <a href="/privacy">Privacy Policy</a> · <a href="/terms">Terms</a>
+        </p>
+
+        <!-- Dynamic success structure rendered through GSAP transitions -->
+        <div id="gsap-success-overlay">
+          <div class="success-icon-wrap">&check;</div>
+          <h3 style="font-family:'Sora', sans-serif; font-size:1.45rem; color:#FFFFFF; margin-bottom:0.5rem;">Profile Created!</h3>
+          <p style="font-size:0.9rem; color:var(--muted); margin-bottom:1rem; max-width:300px;">Verification pending. Opening reward directory configurations...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hero Right - 3D cardbox graphics with opening lid sparkles -->
+    <div class="hero-right">
+      <div class="box-animation-wrapper">
+        <div class="box-sparkle" style="top: 10%; left: 15%;">✦</div>
+        <div class="box-sparkle" style="top: 25%; right: 10%;">✦</div>
+        <div class="box-sparkle" style="bottom: 15%; left: 30%;">✦</div>
+        
+        <div class="gift-box" id="lux-box">
+          <div class="box-face box-front">
+            <div class="ribbon-v"></div>
+            <div class="ribbon-h"></div>
+          </div>
+          <div class="box-face box-back">
+            <div class="ribbon-v"></div>
+          </div>
+          <div class="box-face box-left">
+            <div class="ribbon-v"></div>
+            <div class="ribbon-h"></div>
+          </div>
+          <div class="box-face box-right">
+            <div class="ribbon-v"></div>
+          </div>
+          <div class="box-face box-bottom"></div>
+          <div class="box-lid" id="lux-box-lid">
+            <div class="ribbon-v" style="left:65px"></div>
+            <div class="ribbon-h" style="top:12px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Auto-scrolling infinite Brand marquee loop banner -->
+  <div class="marquee-container">
+    <div class="marquee-track">
+      <span class="marquee-word">AMAZON</span>
+      <span class="marquee-word">WALMART</span>
+      <span class="marquee-word">MAYBELLINE</span>
+      <span class="marquee-word">TIDE</span>
+      <span class="marquee-word">BOSE</span>
+      <span class="marquee-word">PAMPERS</span>
+      <span class="marquee-word">SEPHORA</span>
+      <span class="marquee-word">CADILLAC</span>
+      <!-- Duplicate tracks to wrap seamlessly -->
+      <span class="marquee-word">AMAZON</span>
+      <span class="marquee-word">WALMART</span>
+      <span class="marquee-word">MAYBELLINE</span>
+      <span class="marquee-word">TIDE</span>
+      <span class="marquee-word">BOSE</span>
+      <span class="marquee-word">PAMPERS</span>
+      <span class="marquee-word">SEPHORA</span>
+      <span class="marquee-word">CADILLAC</span>
+    </div>
+  </div>
+
+  <!-- Three ways we deliver value -->
+  <section class="benefits-scroller">
+    <div class="section-title-box">
+      <h3>Three ways we deliver absolute value</h3>
+      <p>Ethical aggregation, total transparency, and verified rewards.</p>
+    </div>
+
+    <div class="feature-grid">
+      <div class="reveal-card">
+        <div class="card-icon">📦</div>
+        <div class="card-title">Physical Sampling boxes</div>
+        <div class="card-body">
+          We hand-curate premium physical bundle tests from verified brands like Maybelline, Tide, and Bose. Delivered straight to your postal address 100% free of charge. No tricky catches.
+        </div>
+      </div>
+      <div class="reveal-card">
+        <div class="card-icon">🎯</div>
+        <div class="card-title">High-Payout Sweepstakes</div>
+        <div class="card-body">
+          We screen legal sweepstakes and promo allocations from Amazon and Walmart. No cost to enter, direct cash-gift options. We display clear odds—honest value, zero lies.
+        </div>
+      </div>
+      <div class="reveal-card">
+        <div class="card-icon">💵</div>
+        <div class="card-title">Verified feedback tasks</div>
+        <div class="card-body">
+          Receive exclusive invitations to participate in product testing boards. Earn rewards, points, or compensation payouts straight after completing brand tasks.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="testimonial-section">
+    <div class="section-title-box">
+      <h3>Reviews from verified members</h3>
+      <p>True feedback from recent participants who took action.</p>
+    </div>
+
+    <div class="testimonial-grid">
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <div class="testimonial-text">
+          "I've claimed 3 sampling packs in the last two months. Got free Tide samples and an incredible snack pack. Highly recommend subscribing to DoggSpace!"
+        </div>
+        <div class="testimonial-user">Sarah M., Dallas TX</div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <div class="testimonial-text">
+          "Completely legit referral platform. The Walmart promo entry took me less than a minute. DoggSpace has the clean interface and transparent guidelines I've been looking for."
+        </div>
+        <div class="testimonial-user">James K., Columbus OH</div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <div class="testimonial-text">
+          "I was worried about spam, but they send useful newsletters with actual links. My cosmetic test packages arrived safely. Solid 5 stars!"
+        </div>
+        <div class="testimonial-user">Lisa R., Tampa FL</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section class="how-it-works-section">
+    <div class="section-title-box">
+      <h3>How it works</h3>
+      <p>Match with curated offers in three transparent steps</p>
+    </div>
+
+    <div class="steps-container">
+      <div class="step-card">
+        <div class="step-number">1</div>
+        <div class="step-title">Enter your details</div>
+        <div class="step-desc">Takes 20 seconds. Absolutely free of charge forever. No credit cards.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-number">2</div>
+        <div class="step-title">Confirm your identity</div>
+        <div class="step-desc">Click the confirmation link sent to your inbox to protect the network.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-number">3</div>
+        <div class="step-title">Claim handpicked rewards</div>
+        <div class="step-desc">Unlock instant matching links, with curated list items dispatched weekly.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ready to start bottom button panel -->
+  <section class="second-opt-in-box">
+    <h3 style="font-family:'Sora', sans-serif; font-size:1.80rem;">Ready to claim your digital rewards?</h3>
+    <p style="color:var(--muted); max-width:550px;">Complete your registration details above to scan available sampling arrays and unlock verified promotion sets instantly!</p>
+    
+    <div class="link-form-container">
+      <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="cta-button" style="width: 100%;">
+        Register My Profile Now ↑
+      </button>
+    </div>
+  </section>
+
+  <!-- Compliance Footer -->
+  <footer>
+    <div class="footer-grid">
+      <!-- Col 1 -->
+      <div class="footer-col">
+        <div class="footer-col-title">FTC Disclosure</div>
+        <p>
+          DoggSpace is an independent rewards aggregator. We match users with verified third-party product sampling and sweepstakes programs. We receive tracking referral compensation when users participate in promoted offers. Compensation does not affect our editorial selection.
+        </p>
+      </div>
+      <!-- Col 2 -->
+      <div class="footer-col">
+        <div class="footer-col-title">Platform Disclaimer</div>
+        <p>
+          This site is entirely independent and carries no endorsement, affiliation, or partnership with Meta Platforms Inc., Facebook Ads, Google LLC, or any advertising platform. All sweepstakes are free to enter. Participation does not guarantee winning. Winners are selected by random draw by sponsoring advertisers.
+        </p>
+      </div>
+      <!-- Col 3 -->
+      <div class="footer-col">
+        <div class="footer-col-title">Navigation Links</div>
+        <div class="footer-links">
+          <a href="/privacy">Privacy Policy</a> | 
+          <a href="/terms">Terms of Service</a> | 
+          <a href="/privacy">Cookie Policy</a> | 
+          <a href="/terms">DMCA Notice</a> | 
+          <a href="/terms">Contact Support</a>
+        </div>
+        <p style="margin-top: 1rem; font-size: 0.7rem; color: var(--muted);">
+          DoggSpace US Office Address: 123 Main Street, Suite 100, Miami, FL 33101
+        </p>
+      </div>
+    </div>
+
+    <div class="bottom-copyright-strip">
+      <p>&copy; 2026 DoggSpace Funnels. All rights reserved.</p>
+      <p>🔒 Secured under regulatory Double Opt-In guidelines</p>
+    </div>
+  </footer>
+
+  <script>
+    // --- AMBIENT FLOATING GOLD PARTICLES CANVAS DRAW ENGINE ---
+    const canvas = document.getElementById('particles-canvas');
+    const ctx = canvas.getContext('2d');
+
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = 700;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    class Particle {
+      constructor() {
+        this.reset();
+      }
+      reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height + canvas.height;
+        this.size = Math.random() * 2 + 1;
+        this.speedY = -(Math.random() * 0.4 + 0.1);
+        this.speedX = Math.random() * 0.4 - 0.2;
+        this.opacity = Math.random() * 0.5 + 0.1;
+      }
+      update() {
+        this.y += this.speedY;
+        this.x += this.speedX;
+        if (this.y < 0) {
+          this.reset();
+        }
+      }
+      draw() {
+        ctx.fillStyle = `rgba(245, 166, 35, ${this.opacity})`;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    for (let i = 0; i < 20; i++) {
+      particles.push(new Particle());
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    // --- GSAP PAGE LOAD ANIMATIONS ---
+    window.addEventListener('DOMContentLoaded', () => {
+      // 1. Headline words translateY stagger
+      gsap.to('.anim-word', {
+        translateY: 0,
+        duration: 0.8,
+        stagger: 0.07,
+        ease: 'power3.out'
+      });
+
+      // 2. Open Gift Box lid on load with sparkle
+      setTimeout(() => {
+        const lid = document.getElementById('lux-box-lid');
+        if (lid) {
+          lid.style.transform = 'translateZ(75px) rotateX(-65deg)';
+        }
+        // Fade in sparkles
+        gsap.fromTo('.box-sparkle', 
+          { opacity: 0, scale: 0.5 },
+          { opacity: 1, scale: 1.2, duration: 0.5, stagger: 0.1, yoyo: true, repeat: 3 }
+        );
+      }, 1000);
+
+      // 3. Float Stat Counter animator
+      let countObj = { val: 41000 };
+      gsap.to(countObj, {
+        val: 47284,
+        duration: 2.5,
+        ease: 'power1.out',
+        onUpdate: () => {
+          document.getElementById('member-counter').textContent = Math.floor(countObj.val).toLocaleString();
+        }
+      });
+    });
+
+    // --- INTERSECTION OBSERVER SCROLL REVEALS ---
+    const cards = document.querySelectorAll('.reveal-card');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.15 });
+
+    cards.forEach(c => observer.observe(c));
+
+    // --- DOUBLE opt-in lead registration script ---
+    let isSubmitting = false;
+
+    const form = document.getElementById('subscribe-form');
+    const submitBtn = document.getElementById('submit-btn');
+    const errorBox = document.getElementById('error-message');
+
+    // Parse incoming queries for affiliate tracking context
+    const urlParams = new URLSearchParams(window.location.search);
+    const utms = {
+      utm_source: urlParams.get('utm_source') || 'organic',
+      utm_campaign: urlParams.get('utm_campaign') || 'direct',
+      utm_medium: urlParams.get('utm_medium') || '',
+      utm_content: urlParams.get('utm_content') || '',
+      utm_term: urlParams.get('utm_term') || ''
+    };
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const nameVal = document.getElementById('fullName').value.trim();
+      const emailVal = document.getElementById('email').value.trim();
+      const consentChecked = document.getElementById('consent-check').checked;
+
+      if (!consentChecked) {
+        errorBox.textContent = "Error: You must check the consent option to proceed.";
+        errorBox.style.display = "block";
+        return;
+      }
+
+      if (nameVal.length < 2) {
+        errorBox.textContent = "Error: First name must be 2 characters or longer.";
+        errorBox.style.display = "block";
+        return;
+      }
+
+      if (isSubmitting) return;
+      isSubmitting = true;
+      submitBtn.disabled = true;
+      submitBtn.textContent = "MATCHING OFFERS...";
+      errorBox.style.display = "none";
+
+      fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: emailVal,
+          name: nameVal,
+          ...utms
+        })
+      })
+      .then(async (res) => {
+        const payload = await res.json();
+        if (!res.ok) {
+          throw new Error(payload.error || "A processing error occurred.");
+        }
+
+        // Fire Confetti explosion of luxury
+        confetti({
+          particleCount: 150,
+          spread: 75,
+          origin: { y: 0.6 }
+        });
+
+        const redirectUrl = `/thankyou?email=${encodeURIComponent(emailVal)}&status=${payload.status}&utm_source=${encodeURIComponent(utms.utm_source)}&utm_campaign=${encodeURIComponent(utms.utm_campaign)}&utm_medium=${encodeURIComponent(utms.utm_medium)}`;
+
+        // Execute GSAP fade-out card transitions before redirect
+        form.style.pointerEvents = 'none';
+
+        const tl = gsap.timeline({
+          onComplete: () => {
+            // Hide standard content
+            document.getElementById('form-header-title').style.display = 'none';
+            document.getElementById('form-sub-header').style.display = 'none';
+            form.style.display = 'none';
+            document.getElementById('form-info-terms').style.display = 'none';
+
+            // Open success overlay
+            const ovr = document.getElementById('gsap-success-overlay');
+            ovr.style.display = 'flex';
+
+            gsap.fromTo(ovr, 
+              { opacity: 0, scale: 0.8 },
+              { opacity: 1, scale: 1, duration: 0.4, ease: 'power2.out' }
+            );
+
+            setTimeout(() => {
+              window.location.href = redirectUrl;
+            }, 1800);
+          }
+        });
+
+        tl.to(['#form-header-title', '#form-sub-header', form, '#form-info-terms'], {
+          opacity: 0,
+          y: -10,
+          stagger: 0.04,
+          duration: 0.3
+        });
+      })
+      .catch((err) => {
+        errorBox.textContent = `Error: ${err.message}`;
+        errorBox.style.display = "block";
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Get My Verified Rewards →";
+        isSubmitting = false;
+      });
+    });
+  </script>
+</body>
+</html>

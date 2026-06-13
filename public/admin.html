@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Prevent read-only Window fetch errors from automated environments -->
+  <script>
+    (function() {
+      try {
+        let currentFetch = window.fetch;
+        Object.defineProperty(window, 'fetch', {
+          get() { return currentFetch; },
+          set(value) { currentFetch = value; },
+          configurable: true,
+          enumerable: true
+        });
+      } catch (e) {
+        console.warn("Fetch shim bypass:", e);
+      }
+    })();
+  </script>
+  <!-- Strongly secured against spiders -->
+  <meta name="robots" content="noindex, nofollow">
+  <title>DoggSpace Funnel | Executive Admin Workspace</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;550;600;700&family=Sora:wght@700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* DESIGN SYSTEM VALUES */
+    :root {
+      --bg: #040914;
+      --surface: #0B1220;
+      --surface2: #111C30;
+      --gold: #F5A623;
+      --gold-dark: #C47F10;
+      --white: #F0F6FF;
+      --muted: rgba(240, 246, 255, 0.52);
+      --subtle: rgba(255, 255, 255, 0.06);
+      --green: #10B981;
+      --red: #EF4444;
+      --radius: 12px;
+      --radius-lg: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--white);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    /* Sticker Header row */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--subtle);
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      font-family: 'Sora', sans-serif;
+      font-weight: 800;
+      font-size: 1.25rem;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .brand span {
+      color: var(--gold);
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-family: 'Sora', sans-serif;
+      font-weight: 700;
+      font-size: 0.88rem;
+      padding: 0.5rem 1.1rem;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .tab-btn:hover {
+      color: #FFFFFF;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .tab-btn.active {
+      background: var(--gold);
+      color: var(--bg);
+    }
+
+    .container {
+      max-width: 1300px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+
+    /* Panel View controllers */
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    /* Metric Grid Widgets */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 850px) {
+      .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .metric-card {
+      background: var(--surface);
+      border: 1px solid var(--subtle);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .metric-card .title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .metric-card .value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #FFFFFF;
+    }
+
+    /* Dual Column Layout styles */
+    .view-grid {
+      display: grid;
+      grid-template-columns: 1.35fr 0.65fr;
+      gap: 2rem;
+    }
+
+    @media (max-width: 950px) {
+      .view-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--subtle);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .card-title {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #FFFFFF;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Unified table layout structures */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--subtle);
+      border-radius: var(--radius);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.85rem;
+    }
+
+    th {
+      background: var(--surface2);
+      color: var(--white);
+      padding: 0.85rem 1rem;
+      font-weight: 600;
+      border-bottom: 1px solid var(--subtle);
+    }
+
+    td {
+      padding: 0.85rem 1rem;
+      color: var(--muted);
+      border-bottom: 1px solid var(--subtle);
+      vertical-align: middle;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      font-size: 0.7rem;
+      font-weight: 750;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .pill-green {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--green);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .pill-orange {
+      background: rgba(245, 166, 35, 0.1);
+      color: var(--gold);
+      border: 1px solid rgba(245, 166, 35, 0.2);
+    }
+
+    .utm-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      background: var(--surface2);
+      color: var(--white);
+      padding: 0.1rem 0.35rem;
+      border-radius: 4px;
+      margin-right: 0.25rem;
+    }
+
+    /* Global inputs and forms */
+    .input-grp {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .input-grp label {
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .input-ctrl {
+      background: var(--surface2);
+      border: 1px solid var(--subtle);
+      color: #FFFFFF;
+      padding: 0.75rem 0.85rem;
+      font-family: inherit;
+      font-size: 0.88rem;
+      border-radius: var(--radius);
+      outline: none;
+    }
+
+    .input-ctrl:focus {
+      border-color: var(--gold);
+    }
+
+    textarea.input-ctrl {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    /* Buttons */
+    .btn {
+      background: var(--white);
+      color: var(--bg);
+      font-weight: 700;
+      font-size: 0.84rem;
+      font-family: 'Sora', sans-serif;
+      padding: 0.7rem 1.2rem;
+      border-radius: var(--radius);
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      background: var(--gold);
+      color: var(--bg);
+    }
+
+    .btn-red {
+      background: rgba(239, 68, 68, 0.1);
+      color: #F87171;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .btn-red:hover {
+      background: var(--red);
+      color: #FFFFFF;
+      border-color: var(--red);
+    }
+
+    .btn-gold {
+      background: var(--gold);
+      color: var(--bg);
+    }
+
+    .btn-gold:hover {
+      background: var(--gold-dark);
+    }
+
+    /* Active switches custom CSS toggler */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 22px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--surface2);
+      border: 1px solid var(--subtle);
+      transition: .3s;
+      border-radius: 34px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 14px;
+      width: 14px;
+      left: 3px;
+      bottom: 3px;
+      background-color: var(--muted);
+      transition: .3s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: var(--green);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(18px);
+      background-color: var(--bg);
+    }
+
+    /* AI WRITER SPECIFIC STYLES */
+    .writer-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 650px) {
+      .writer-form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .workspace-split {
+      display: grid;
+      grid-template-columns: 0.85fr 1.15fr;
+      gap: 2rem;
+    }
+
+    @media (max-width: 950px) {
+      .workspace-split {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .output-textbox {
+      background: #02050c;
+      border: 1px solid var(--subtle);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.88rem;
+      color: #9cdcfe;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      min-height: 380px;
+      max-height: 520px;
+      overflow-y: auto;
+    }
+
+    /* Loading Skeletons animation for AI Copywriter */
+    .skeleton-line {
+      height: 14px;
+      background: var(--surface2);
+      border-radius: 4px;
+      margin-bottom: 0.75rem;
+      animation: pulseLoading 1.5s infinite ease-in-out;
+    }
+
+    @keyframes pulseLoading {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.8; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sticky Header -->
+  <header>
+    <div class="brand">
+      💼 <span>Dogg</span>Space Executive Workspace
+    </div>
+    <div class="nav-tabs">
+      <button class="tab-btn active" id="btn-tab-leads" onclick="switchMainTab('leads')">📊 Leads Console</button>
+      <button class="tab-btn" id="btn-tab-offers" onclick="switchMainTab('offers')">🎁 Offers Matrix</button>
+      <button class="tab-btn" id="btn-tab-writer" onclick="switchMainTab('writer')">✨ AI Copywriter</button>
+    </div>
+  </header>
+
+  <!-- Content Container -->
+  <main class="container">
+
+    <!-- 1. LEADS CONSOLE PANEL VIEWS -->
+    <div class="tab-panel active" id="pane-tab-leads">
+      <!-- Quick Indicators -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <span class="title">Total Subscribers</span>
+          <span class="value" id="leads-tot-sub">0</span>
+        </div>
+        <div class="metric-card">
+          <span class="title">New Signups (Today)</span>
+          <span class="value" id="leads-tot-today">0</span>
+        </div>
+        <div class="metric-card">
+          <span class="title">Total Ad Clicks</span>
+          <span class="value" id="leads-tot-clicks">0</span>
+        </div>
+        <div class="metric-card">
+          <span class="title">Catalog Offers Active</span>
+          <span class="value" id="leads-tot-offers">0</span>
+        </div>
+      </div>
+
+      <!-- Action console and lists grid -->
+      <div class="view-grid">
+        <!-- Main leads sheet -->
+        <div class="card">
+          <div class="card-title">
+            <span>Members Database Log</span>
+            <div style="display: flex; gap: 0.5rem; align-items:center;">
+              <input type="text" id="leads-search-input" class="input-ctrl" placeholder="Search Email / UTM..." style="padding: 0.45rem 0.85rem; font-size:0.78rem; width:180px;">
+              <a href="/api/admin/subscribers/export" class="btn" style="padding: 0.45rem 1rem; font-size:0.78rem;">📥 Export CSV</a>
+            </div>
+          </div>
+
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Contact info</th>
+                  <th>Attribution Sources</th>
+                  <th>IP Address</th>
+                  <th>Verification Status</th>
+                  <th>Created At</th>
+                  <th>Remove</th>
+                </tr>
+              </thead>
+              <tbody id="leads-logs-table">
+                <!-- Subscriber logs loaded dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Global Webhook mappings -->
+        <div class="card">
+          <div class="card-title">ESP Webhook Configuration</div>
+          <p style="font-size: 0.8rem; color: var(--muted); margin-top:-0.5rem;">We dispatch payload variables to integrations concurrently when leads register in our database pipeline.</p>
+          
+          <form id="settings-hook-form" style="display:flex; flex-direction:column; gap:1.1rem;">
+            <div class="input-grp">
+              <label>Brevo Webhook Target</label>
+              <input type="url" id="hook-brevo" class="input-ctrl" placeholder="https://api.brevo.com/v3/...">
+            </div>
+            <div class="input-grp">
+              <label>ActiveCampaign Webhook</label>
+              <input type="url" id="hook-activecampaign" class="input-ctrl" placeholder="https://yourbrand.activehosted.com/...">
+            </div>
+            <div class="input-grp">
+              <label>ConvertKit Webhook</label>
+              <input type="url" id="hook-convertkit" class="input-ctrl" placeholder="https://api.convertkit.com/...">
+            </div>
+            <div class="input-grp">
+              <label>Google Sheet Webhook</label>
+              <input type="url" id="hook-sheets" class="input-ctrl" placeholder="https://script.google.com/macros/s/...">
+            </div>
+
+            <button type="submit" class="btn btn-gold" style="width:100%;">
+              💾 Save ESP Integrations
+            </button>
+          </form>
+
+          <div style="margin-top:2rem; padding-top:1.5rem; border-top:1px solid var(--subtle);">
+            <div class="card-title" style="color:var(--red); font-size:1rem;">Danger Zone Actions</div>
+            <p style="font-size:0.75rem; color:var(--muted); margin:0.5rem 0 1rem 0;">This deletes subscriber records and logs. This process can't be undone.</p>
+            <button onclick="dangerWipeDatabase()" class="btn btn-red" style="width:100%;">
+              🗑 Wipe subscriber logs completely
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- 2. OFFERS MATRIX MANAGEMENT VIEWS -->
+    <div class="tab-panel" id="pane-tab-offers">
+      <div class="view-grid">
+        <!-- Offers Catalogue Sheet -->
+        <div class="card">
+          <div class="card-title">Seeded MaxBounty CPA Matrix</div>
+
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Pos</th>
+                  <th>Offer details</th>
+                  <th>Network</th>
+                  <th>Payout / EPC</th>
+                  <th>Verification Type</th>
+                  <th>Category Tier</th>
+                  <th>Status Active</th>
+                  <th>Edit</th>
+                </tr>
+              </thead>
+              <tbody id="offers-matrix-table">
+                <!-- Seeded offers list -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Add/Edit Campaign Form panel in card -->
+        <div class="card">
+          <div class="card-title" id="offer-editor-title">Create Brand Campaign Offer</div>
+          
+          <form id="offer-crud-form" style="display:flex; flex-direction:column; gap:1rem;">
+            <input type="hidden" id="offer-field-id">
+
+            <div class="input-grp">
+              <label>Offer Sizing Name</label>
+              <input type="text" id="offer-field-name" class="input-ctrl" required placeholder="e.g. Maybelline Cosmetics Kit">
+            </div>
+
+            <div class="writer-form-grid">
+              <div class="input-grp">
+                <label>Offer Target ID / SKU</label>
+                <input type="text" id="offer-field-sku" class="input-ctrl" placeholder="e.g. 24725">
+              </div>
+              <div class="input-grp">
+                <label>Verification Type</label>
+                <select id="offer-field-cpatype" class="input-ctrl">
+                  <option value="DOI">DOI (Double Opt-In)</option>
+                  <option value="SOI">SOI (Single Opt-In)</option>
+                  <option value="CPL">CPL (Cost Per Lead)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="writer-form-grid">
+              <div class="input-grp">
+                <label>Network source</label>
+                <input type="text" id="offer-field-network" class="input-ctrl" required placeholder="e.g. MaxBounty">
+              </div>
+              <div class="input-grp">
+                <label>Sequence Order Pos</label>
+                <input type="number" id="offer-field-pos" class="input-ctrl" required value="99" min="1">
+              </div>
+            </div>
+
+            <div class="writer-form-grid">
+              <div class="input-grp">
+                <label>Payout Commission ($)</label>
+                <input type="number" id="offer-field-payout" class="input-ctrl" required value="1.50" step="0.01" min="0">
+              </div>
+              <div class="input-grp">
+                <label>EPC ($)</label>
+                <input type="number" id="offer-field-epc" class="input-ctrl" required value="0.15" step="0.01" min="0">
+              </div>
+            </div>
+
+            <div class="writer-form-grid">
+              <div class="input-grp">
+                <label>Visual Badge</label>
+                <input type="text" id="offer-field-badge" class="input-ctrl" placeholder="e.g. Ships Free 📦">
+              </div>
+              <div class="input-grp">
+                <label>Category Tier</label>
+                <select id="offer-field-tier" class="input-ctrl">
+                  <option value="1">Tier 1: Free Shipping Samples</option>
+                  <option value="2">Tier 2: Entries & Sweepstakes</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="writer-form-grid">
+              <div class="input-grp">
+                <label>Emoji Icon</label>
+                <input type="text" id="offer-field-icon" class="input-ctrl" required value="🎁" placeholder="e.g. 💄">
+              </div>
+              <div class="input-grp">
+                <label>Unsplash Keyword</label>
+                <select id="offer-field-keyword" class="input-ctrl">
+                  <option value="free sample box products colorful">Free sample box image</option>
+                  <option value="Maybelline makeup cosmetics set colorful">Maybelline cosmetics image</option>
+                  <option value="healthy snack box food samples">Healthy snack image</option>
+                  <option value="pistachio chocolate luxury Dubai bar">Viral chocolate image</option>
+                  <option value="product testing panel samples variety">Testing panel image</option>
+                  <option value="Amazon gift card shopping prize">Amazon promo image</option>
+                  <option value="Walmart gift card prize winner">Walmart promo image</option>
+                  <option value="Tide laundry detergent household products">Tide house cleanliness image</option>
+                  <option value="Pampers baby products family">Pampers baby care image</option>
+                  <option value="Bose headphones premium audio">Bose premium audio image</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="input-grp">
+              <label>Destination Affiliate Link (Tracking URL)</label>
+              <input type="url" id="offer-field-affurl" class="input-ctrl" required placeholder="https://www.maxbounty.com/tracker.cfm">
+            </div>
+
+            <div class="input-grp">
+              <label>Consumer Description text</label>
+              <textarea id="offer-field-desc" class="input-ctrl" required placeholder="Outline direct ships and guidelines for participants..."></textarea>
+            </div>
+
+            <div style="display:flex; gap:0.5rem; margin-top:0.5rem;">
+              <button type="button" onclick="resetOfferCrudForm()" class="btn" style="flex:1;">
+                Clear Form
+              </button>
+              <button type="submit" class="btn btn-gold" style="flex:1.5;">
+                💾 Save Campaign
+              </button>
+            </div>
+
+            <button type="button" id="offer-delete-action-btn" onclick="deleteOfferRowDirect()" class="btn btn-red" style="display:none; width:100%; margin-top:0.5rem;">
+              🗑 Permanently Delete Offer
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- 3. AI ELECTRON COPYWRITER PANEL VIEWS -->
+    <div class="tab-panel" id="pane-tab-writer">
+      <div class="card">
+        <div class="card-title">✨ AI Conversion Copywriter Engine</div>
+        <p style="font-size:0.85rem; color:var(--muted); margin-top:-0.5rem;">
+          Draft high-converting affiliate copy sets customized around specific campaigns. This makes call requests directly to Anthropic's Claude models via our server proxy, securing key privacy.
+        </p>
+
+        <div class="workspace-split">
+          <!-- Control desk form inputs -->
+          <div style="display:flex; flex-direction:column; gap:1.25rem;">
+            
+            <div class="input-grp">
+              <label>Anthropic API Token KEY</label>
+              <input type="password" id="writer-api-key" class="input-ctrl" placeholder="sk-ant-api03-..." required>
+              <span style="font-size:0.7rem; color:var(--muted)">Keys are held transiently inside standard state variables and are never persisted to databases.</span>
+            </div>
+
+            <div class="input-grp">
+              <label>Campaign/Target Offer</label>
+              <select id="writer-offer-select" class="input-ctrl">
+                <!-- Automatically indexed from database seeded rows -->
+              </select>
+            </div>
+
+            <div class="input-grp">
+              <label>Core Marketing Benefit / Hooks</label>
+              <input type="text" id="writer-hooks" class="input-ctrl" placeholder="e.g. Free shipping cosmetics kit - reviewing review reviews" required style="font-size:0.85rem">
+            </div>
+
+            <div class="writer-form-grid">
+              <div class="input-grp">
+                <label>Persuasive tone</label>
+                <select id="writer-tone" class="input-ctrl">
+                  <option value="Curiosity-Driven">Curiosity-Driven (Open Loops)</option>
+                  <option value="Urgent">Urgent (Scarcity Countdown)</option>
+                  <option value="Warm & Friendly">Warm & Friendly (Advising)</option>
+                  <option value="Benefit-Focused">Direct Benefit-Focused</option>
+                  <option value="Bold">Bold (Provocative CTA)</option>
+                </select>
+              </div>
+
+              <div class="input-grp">
+                <label>Sequence Email Stage</label>
+                <select id="writer-stage" class="input-ctrl">
+                  <option value="Cold Prospect">Squeeze cold list welcome</option>
+                  <option value="Verification Follow-Up">Double Opt-In verifier trigger</option>
+                  <option value="Welcome rewards delivery">Welcome directory unlocking</option>
+                  <option value="Urgent closing threshold">Campaign closing limit alert</option>
+                </select>
+              </div>
+            </div>
+
+            <button onclick="generateAICopyDraft()" class="btn btn-gold" id="writer-gen-btn" style="padding:1rem; font-size:1rem; margin-top:0.5rem;">
+              ✨ Generate Conversion Copy draft &rarr;
+            </button>
+          </div>
+
+          <!-- Output panel preview block -->
+          <div style="display:flex; flex-direction:column; gap:1rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="input-label" style="font-size:0.76rem;">Generated Output (Copyable Markdown)</span>
+              <button onclick="copyDraftToClipboard()" class="btn" id="writer-copy-btn" style="padding:0.35rem 0.8rem; font-size:0.75rem" disabled>
+                📋 Copy Copy
+              </button>
+            </div>
+
+            <!-- Standard copy preview screen window -->
+            <div class="output-textbox" id="writer-output-screen">
+              Copy variables are currently empty. Supply your Anthropic credentials and click "Generate Correspondence" above to write draft.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // System operational matrices
+    let leadsData = [];
+    let offersData = [];
+    let activeSettings = {};
+
+    // --- TAB FLOW ROUTER ---
+    function switchMainTab(tabName) {
+      document.querySelectorAll('.tab-panel').forEach(pane => {
+        pane.classList.remove('active');
+      });
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+
+      document.getElementById(`pane-tab-${tabName}`).classList.add('active');
+      document.getElementById(`btn-tab-${tabName}`).classList.add('active');
+
+      if (tabName === 'leads') {
+        loadDashboardLeads();
+      } else if (tabName === 'offers') {
+        loadActiveOffersMatrix();
+      } else if (tabName === 'writer') {
+        loadAIWriterDropdowns();
+      }
+    }
+
+    // Initialize Dashboard setup
+    window.addEventListener('DOMContentLoaded', () => {
+      loadDashboardLeads();
+    });
+
+    // --- VIEW LEADS TAB CONTROLLER SCRIPTS ---
+    function loadDashboardLeads() {
+      const searchVal = document.getElementById('leads-search-input').value;
+      const url = searchVal ? `/api/admin/subscribers?search=${encodeURIComponent(searchVal)}` : '/api/admin/subscribers';
+
+      // Load Stats
+      fetch('/api/admin/stats')
+        .then(res => res.json())
+        .then(stats => {
+          document.getElementById('leads-tot-sub').textContent = stats.total_subscribers.toLocaleString();
+          document.getElementById('leads-tot-today').textContent = stats.new_today.toLocaleString();
+          document.getElementById('leads-tot-clicks').textContent = stats.total_clicks.toLocaleString();
+          document.getElementById('leads-tot-offers').textContent = stats.active_offers.toLocaleString();
+        })
+        .catch(err => console.error("Stats fetching failed:", err));
+
+      // Load Settings hooks
+      fetch('/api/admin/settings')
+        .then(res => res.json())
+        .then(settings => {
+          activeSettings = settings;
+          document.getElementById('hook-brevo').value = settings.brevo_webhook || '';
+          document.getElementById('hook-activecampaign').value = settings.activecampaign_webhook || '';
+          document.getElementById('hook-convertkit').value = settings.convertkit_webhook || '';
+          document.getElementById('hook-sheets').value = settings.googlesheet_webhook || '';
+        })
+        .catch(err => console.error("Settings fetching failed:", err));
+
+      // Load Table Logs
+      fetch(url)
+        .then(res => res.json())
+        .then(users => {
+          leadsData = users;
+          const root = document.getElementById('leads-logs-table');
+          root.innerHTML = '';
+
+          if (users.length === 0) {
+            root.innerHTML = '<tr><td colspan="6" style="text-align:center;">No subscribers found matching those filters.</td></tr>';
+            return;
+          }
+
+          users.forEach(r => {
+            const dateStr = new Date(r.created_at).toLocaleString();
+            const badgeHtml = r.confirmed === 1 ? '<span class="pill pill-green">DOI Active</span>' : '<span class="pill pill-orange">Unconfirmed</span>';
+            
+            const utmHtml = `
+              <span class="utm-tag" title="Source">${r.utm_source || 'organic'}</span>
+              <span class="utm-tag" title="Campaign">${r.utm_campaign || 'direct'}</span>
+              ${r.utm_medium ? `<span class="utm-tag" title="Medium">${r.utm_medium}</span>` : ''}
+            `;
+
+            const trHtml = `
+              <tr id="subscriber-row-${r.id}">
+                <td>
+                  <strong>${r.name || 'Subscriber'}</strong><br>
+                  <span style="font-size:0.75rem; color:var(--muted)">${r.email}</span>
+                </td>
+                <td>${utmHtml}</td>
+                <td><span style="font-family:monospace; font-size:0.78rem;">${r.ip || 'Local'}</span></td>
+                <td>${badgeHtml}</td>
+                <td>${dateStr}</td>
+                <td>
+                  <button onclick="deleteSubscriberRow(${r.id})" class="btn btn-red" style="padding:0.3rem 0.6rem; font-size:0.75rem">🗑</button>
+                </td>
+              </tr>
+            `;
+            root.insertAdjacentHTML('beforeend', trHtml);
+          });
+        })
+        .catch(err => console.error("Subscriber loading failed:", err));
+    }
+
+    // Listen on dynamic search feeds
+    document.getElementById('leads-search-input').addEventListener('input', () => {
+      loadDashboardLeads();
+    });
+
+    // Delete single lead row
+    function deleteSubscriberRow(id) {
+      if (!confirm("Are you sure you want to permanently delete this subscriber row details?")) return;
+      
+      fetch(`/api/admin/subscribers/${id}`, { method: 'DELETE' })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            const row = document.getElementById(`subscriber-row-${id}`);
+            if (row) row.remove();
+            loadDashboardLeads();
+          } else {
+            alert("Error removing subscriber.");
+          }
+        })
+        .catch(e => console.error("Sub delete error Exception:", e));
+    }
+
+    // Save ESP Hooks Form
+    document.getElementById('settings-hook-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const payload = {
+        brevo_webhook: document.getElementById('hook-brevo').value.trim(),
+        activecampaign_webhook: document.getElementById('hook-activecampaign').value.trim(),
+        convertkit_webhook: document.getElementById('hook-convertkit').value.trim(),
+        googlesheet_webhook: document.getElementById('hook-sheets').value.trim()
+      };
+
+      fetch('/api/admin/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert("ESP Webhooks successfully stored in settings configuration!");
+          loadDashboardLeads();
+        } else {
+          alert("Failed to update settings mapping.");
+        }
+      })
+      .catch(err => console.error(err));
+    });
+
+    // Danger Purge Trigger
+    function dangerWipeDatabase() {
+      if (!confirm("🚨 DANGER ZONE ALERT!\n\nAre you sure you want to completely wipe all subscriber leads and click logs from the database?\nThis has zero recover pathways.")) return;
+      if (!prompt("Type COMPILING to execute full wipe operations:") === 'COMPILING') {
+        alert("Operation abort. Correct confirmation text is required.");
+        return;
+      }
+
+      fetch('/api/admin/settings/wipe', { method: 'POST' })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            alert("Database table log files successfully purged cleanly.");
+            loadDashboardLeads();
+          } else {
+            alert("Errors occurred during table flushes.");
+          }
+        })
+        .catch(err => console.error(err));
+    }
+
+
+    // --- OFFERS TAB CONTROLLER ENGINE SCRIPTS ---
+    function loadActiveOffersMatrix() {
+      fetch('/api/admin/offers')
+        .then(res => res.json())
+        .then(data => {
+          offersData = data;
+          const root = document.getElementById('offers-matrix-table');
+          root.innerHTML = '';
+
+          data.forEach(item => {
+            const checkState = item.active === 1 ? 'checked' : '';
+            const trHtml = `
+              <tr>
+                <td><strong>${item.position}</strong></td>
+                <td>
+                  <strong>${item.icon} ${item.name}</strong><br>
+                  <span style="font-size:0.75rem; color:var(--muted)">ID: ${item.offer_id || 'unlinked'} &middot; ${item.description.slice(0, 48)}...</span>
+                </td>
+                <td><span style="font-weight:600;">${item.network}</span></td>
+                <td>
+                  Payout: <span style="font-family:monospace; color:var(--gold); font-weight:700;">$${item.payout.toFixed(2)}</span><br>
+                  EPC: <span style="font-family:monospace; color:var(--green); font-weight:700;">$${item.epc.toFixed(2)}</span>
+                </td>
+                <td>${item.cpa_type}</td>
+                <td><span class="pill" style="background:rgba(255,255,255,0.05)">Tier ${item.tier}</span></td>
+                <td>
+                  <label class="switch">
+                    <input type="checkbox" ${checkState} onchange="toggleOfferActiveState(${item.id})">
+                    <span class="slider"></span>
+                  </label>
+                </td>
+                <td>
+                  <button onclick="bindOfferToEditor(${item.id})" class="btn" style="padding:0.35rem 0.75rem; font-size:0.75rem">Edit ✏</button>
+                </td>
+              </tr>
+            `;
+            root.insertAdjacentHTML('beforeend', trHtml);
+          });
+        })
+        .catch(err => console.error("Failed to load offers matrix:", err));
+    }
+
+    // Toggle Offer Active Checkbox
+    function toggleOfferActiveState(id) {
+      fetch(`/api/admin/offers/${id}/toggle`, { method: 'PATCH' })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            console.log(`Switched offer active status to: ${data.active}`);
+            loadActiveOffersMatrix();
+          } else {
+            alert("Failed to switch state.");
+          }
+        })
+        .catch(err => console.error(err));
+    }
+
+    // Bind item to edit inputs
+    function bindOfferToEditor(id) {
+      const item = offersData.find(o => o.id === id);
+      if (!item) return;
+
+      document.getElementById('offer-editor-title').textContent = `✏ Edit Campaign: ${item.name}`;
+      document.getElementById('offer-field-id').value = item.id;
+      document.getElementById('offer-field-name').value = item.name;
+      document.getElementById('offer-field-sku').value = item.offer_id;
+      document.getElementById('offer-field-cpatype').value = item.cpa_type;
+      document.getElementById('offer-field-network').value = item.network;
+      document.getElementById('offer-field-pos').value = item.position;
+      document.getElementById('offer-field-payout').value = item.payout;
+      document.getElementById('offer-field-epc').value = item.epc;
+      document.getElementById('offer-field-badge').value = item.badge || '';
+      document.getElementById('offer-field-tier').value = item.tier;
+      document.getElementById('offer-field-icon').value = item.icon;
+      document.getElementById('offer-field-keyword').value = item.image_keyword;
+      document.getElementById('offer-field-affurl').value = item.affiliate_link;
+      document.getElementById('offer-field-desc').value = item.description;
+
+      document.getElementById('offer-delete-action-btn').style.display = 'block';
+    }
+
+    // Clear / Reset CRUD Form
+    function resetOfferCrudForm() {
+      document.getElementById('offer-editor-title').textContent = "Create Brand Campaign Offer";
+      document.getElementById('offer-field-id').value = '';
+      document.getElementById('offer-crud-form').reset();
+      document.getElementById('offer-delete-action-btn').style.display = 'none';
+    }
+
+    // Save Offer (POST create or PUT rewrite)
+    document.getElementById('offer-crud-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const idVal = document.getElementById('offer-field-id').value;
+      const method = idVal ? 'PUT' : 'POST';
+      const endpoint = idVal ? `/api/admin/offers/${idVal}` : `/api/admin/offers`;
+
+      const payload = {
+        name: document.getElementById('offer-field-name').value.trim(),
+        offer_id: document.getElementById('offer-field-sku').value.trim(),
+        cpa_type: document.getElementById('offer-field-cpatype').value,
+        network: document.getElementById('offer-field-network').value.trim(),
+        position: parseInt(document.getElementById('offer-field-pos').value),
+        payout: parseFloat(document.getElementById('offer-field-payout').value),
+        epc: parseFloat(document.getElementById('offer-field-epc').value),
+        badge: document.getElementById('offer-field-badge').value.trim(),
+        tier: parseInt(document.getElementById('offer-field-tier').value),
+        icon: document.getElementById('offer-field-icon').value.trim(),
+        image_keyword: document.getElementById('offer-field-keyword').value,
+        affiliate_link: document.getElementById('offer-field-affurl').value.trim(),
+        description: document.getElementById('offer-field-desc').value.trim(),
+        active: 1
+      };
+
+      fetch(endpoint, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert("Campaign offer saved successfully!");
+          resetOfferCrudForm();
+          loadActiveOffersMatrix();
+        } else {
+          alert("Failed to write to database: " + (data.error || 'Check fields'));
+        }
+      })
+      .catch(err => console.error(err));
+    });
+
+    // Delete offer completely
+    function deleteOfferRowDirect() {
+      const idVal = document.getElementById('offer-field-id').value;
+      if (!idVal) return;
+
+      if (!confirm("Are you sure you want to permanently delete this offer catalog item? This will break analytics measurements for this campaign.")) return;
+
+      fetch(`/api/admin/offers/${idVal}`, { method: 'DELETE' })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            alert("Offer successfully removed from database!");
+            resetOfferCrudForm();
+            loadActiveOffersMatrix();
+          } else {
+            alert("Error deleting database row.");
+          }
+        })
+        .catch(err => console.error(err));
+    }
+
+
+    // --- AI ELECTRON COPYWRITER SCRIPTS ---
+    function loadAIWriterDropdowns() {
+      fetch('/api/offers')
+        .then(res => res.json())
+        .then(offers => {
+          const select = document.getElementById('writer-offer-select');
+          select.innerHTML = '';
+          offers.forEach(o => {
+            const opt = document.createElement('option');
+            opt.value = o.name;
+            opt.textContent = `${o.icon} ${o.name} ($${o.payout.toFixed(2)} payout)`;
+            select.appendChild(opt);
+          });
+        })
+        .catch(err => console.error(err));
+    }
+
+    // Call server AI generate proxy
+    function generateAICopyDraft() {
+      const keyVal = document.getElementById('writer-api-key').value.trim();
+      const offerVal = document.getElementById('writer-offer-select').value;
+      const benefitVal = document.getElementById('writer-hooks').value.trim();
+      const toneVal = document.getElementById('writer-tone').value;
+      const stageVal = document.getElementById('writer-stage').value;
+
+      if (!keyVal) {
+        alert("Please paste your Anthropic API Key to proceed.");
+        return;
+      }
+      if (!benefitVal) {
+        alert("Please define the core marketing hooks/benefits.");
+        return;
+      }
+
+      // Initialize pulsing skeleton screen
+      const screen = document.getElementById('writer-output-screen');
+      screen.innerHTML = `
+        <div class="skeleton-line" style="width: 40%"></div>
+        <div class="skeleton-line" style="width: 25%"></div>
+        <br>
+        <div class="skeleton-line" style="width: 90%"></div>
+        <div class="skeleton-line" style="width: 85%"></div>
+        <div class="skeleton-line" style="width: 95%"></div>
+        <div class="skeleton-line" style="width: 70%"></div>
+      `;
+
+      const genBtn = document.getElementById('writer-gen-btn');
+      const copyBtn = document.getElementById('writer-copy-btn');
+
+      genBtn.disabled = true;
+      genBtn.textContent = "WRITING DRAFT IN CLAUDE...";
+      copyBtn.disabled = true;
+
+      fetch('/api/admin/writer/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          apiKey: keyVal,
+          offerName: offerVal,
+          benefit: benefitVal,
+          tone: toneVal,
+          stage: stageVal
+        })
+      })
+      .then(async (res) => {
+        const payload = await res.json();
+        if (!res.ok) {
+          throw new Error(payload.error || "Generation query failed.");
+        }
+        screen.textContent = payload.result;
+        copyBtn.disabled = false;
+      })
+      .catch((err) => {
+        screen.textContent = `⚠ Errors occurred during Claude compilation: \n\n${err.message}\n\nVerify that your API keys are correct, and checking network status.`;
+        copyBtn.disabled = true;
+      })
+      .finally(() => {
+        genBtn.disabled = false;
+        genBtn.textContent = "✨ Generate Conversion Copy draft →";
+      });
+    }
+
+    // Clipboards assist tool
+    function copyDraftToClipboard() {
+      const textVal = document.getElementById('writer-output-screen').textContent;
+      navigator.clipboard.writeText(textVal)
+        .then(() => {
+          const btn = document.getElementById('writer-copy-btn');
+          const oldTxt = btn.textContent;
+          btn.textContent = "✓ Text Saved!";
+          setTimeout(() => {
+            btn.textContent = oldTxt;
+          }, 1500);
+        })
+        .catch(err => {
+          console.error("Clipboard permission denied:", err);
+          alert("Clipboard write failed. Please highlight and copy manually.");
+        });
+    }
+  </script>
+</body>
+</html>

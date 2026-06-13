@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Prevent read-only Window fetch errors from automated environments -->
+  <script>
+    (function() {
+      try {
+        let currentFetch = window.fetch;
+        Object.defineProperty(window, 'fetch', {
+          get() { return currentFetch; },
+          set(value) { currentFetch = value; },
+          configurable: true,
+          enumerable: true
+        });
+      } catch (e) {
+        console.warn("Fetch shim bypass:", e);
+      }
+    })();
+  </script>
+  <meta name="robots" content="index, nofollow">
+  <title>Privacy Policy | DoggSpace</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #040914;
+      --surface: #0B1220;
+      --surface2: #111C30;
+      --gold: #F5A623;
+      --white: #F0F6FF;
+      --muted: rgba(240, 246, 255, 0.52);
+      --subtle: rgba(255, 255, 255, 0.06);
+      --radius: 14px;
+      --radius-lg: 22px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--white);
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+      line-height: 1.7;
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      width: 100%;
+      height: 70px;
+      background: rgba(4, 9, 20, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 2rem;
+      z-index: 100;
+    }
+
+    .logo {
+      font-family: 'Sora', sans-serif;
+      font-weight: 800;
+      font-size: 1.35rem;
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .logo span {
+      color: var(--gold);
+    }
+
+    .nav-link {
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+
+    .nav-link:hover {
+      color: var(--gold);
+    }
+
+    main {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 4rem 2rem;
+    }
+
+    .policy-container {
+      background: var(--surface);
+      border: 1px solid var(--subtle);
+      border-radius: var(--radius-lg);
+      padding: 3rem;
+    }
+
+    @media (max-width: 600px) {
+      .policy-container {
+        padding: 1.5rem;
+      }
+    }
+
+    h1 {
+      font-family: 'Sora', sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+      color: #FFFFFF;
+      margin-bottom: 0.5rem;
+    }
+
+    .last-updated {
+      font-size: 0.85rem;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 2.5rem;
+    }
+
+    h2 {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.25rem;
+      color: #FFFFFF;
+      margin: 2rem 0 1rem;
+    }
+
+    p {
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+    }
+
+    ul {
+      margin-left: 1.5rem;
+      margin-bottom: 1.5rem;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    li {
+      margin-bottom: 0.5rem;
+    }
+
+    footer {
+      background: #02050c;
+      border-top: 1px solid var(--subtle);
+      padding: 3rem 2rem;
+      text-align: center;
+      font-size: 0.76rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="/" class="logo">
+      <span>Dogg</span>Space
+    </a>
+    <a href="/" class="nav-link">&larr; Back to home</a>
+  </nav>
+
+  <main>
+    <div class="policy-container">
+      <h1>Privacy Policy</h1>
+      <div class="last-updated">Last Updated: June 13, 2026</div>
+
+      <p>
+        Welcome to DoggSpace ("we," "our," or "us"). We value your privacy and are committed to protecting your personal information. This Privacy Policy outlines how we collect, use, disclose, and safeguard your data when you subscribe to our rewards newsletter and utilize our offer directories.
+      </p>
+
+      <h2>1. Information We Collect</h2>
+      <p>
+        To deliver targeted reward samples, brand testing invitations, and sweepstakes opportunities, we collect information you explicitly provide:
+      </p>
+      <ul>
+        <li><strong>Personal Identifiers:</strong> First name and email address.</li>
+        <li><strong>Advertising & Attribution Context:</strong> UTM parameters (utm_source, utm_medium, utm_campaign, utm_content, utm_term) used to map user traffic sources.</li>
+        <li><strong>Technical Metadata:</strong> IP addresses and browser user-agent tokens logged to verify registration integrity and capture unique clicks.</li>
+      </ul>
+
+      <h2>2. How We Use Your Information</h2>
+      <p>
+        Your data is processed in under 100ms when subscribing to satisfy three objectives:
+      </p>
+      <ul>
+        <li>Processing double opt-in verification registrations to confirm mailbox ownership and shield against spam.</li>
+        <li>Forwarding contact profiles to connected Email Service Providers (ESPs) such as Brevo, ActiveCampaign, or ConvertKit, which distribute the sampling updates you requested.</li>
+        <li>Aggregating anonymous analytics clicks and payouts to calibrate EPC metrics.</li>
+      </ul>
+
+      <h2>3. Third-Party Referral Disclosures</h2>
+      <p>
+        We function as an independent affiliate aggregator. When you participate in CPA or CPL offers listed in our directory (such as MaxBounty promotions), you redirect to outer advertiser gateways. These third-party sites possess unique cookies, trackers, and privacy policies independent of our systems. We earn referral fees when you complete these external offers.
+      </p>
+
+      <h2>4. Your Rights & Choice</h2>
+      <p>
+        We strictly align with CAN-SPAM specifications. You retain absolute control over your subscriptions:
+      </p>
+      <ul>
+        <li><strong>One-Click Opt-Out:</strong> Every email dispatched by our connected ESP systems contains an instant, one-click unsubscribe mechanism.</li>
+        <li><strong>Data Portability & Erasure:</strong> You can contact support to request complete removal of your historical subscriber rows on file.</li>
+      </ul>
+
+      <h2>5. Security Standards</h2>
+      <p>
+        We employ industry-standard security headers (Helmet configurations), rate limiters, and environment secrets protection to prevent unauthorized administrative entry. Database logs are housed behind encrypted firewalls.
+      </p>
+
+      <h2>6. Contact Us</h2>
+      <p>
+        If you have questions regarding this policy or seek account removals, contact us at:<br>
+        <strong>Email:</strong> privacy@doggspace.com<br>
+        <strong>Address:</strong> 123 Main Street, Suite 100, Miami, FL 33101
+      </p>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 DoggSpace Funnels. All rights reserved.</p>
+  </footer>
+
+</body>
+</html>

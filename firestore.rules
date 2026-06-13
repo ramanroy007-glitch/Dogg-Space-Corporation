@@ -1,0 +1,133 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Safety Net: default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Shared global primitives
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isEmailVerified() {
+      return request.auth.token.email_verified == true;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && 
+             isEmailVerified() && 
+             request.auth.token.email == 'raman.roy007@gmail.com';
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // -----------------------------------------------------
+    // PANELS collection: /panels/{panelId}
+    // Consumers can read all panels. Admins can manage them.
+    // -----------------------------------------------------
+    match /panels/{panelId} {
+      allow get: if true;
+      allow list: if true;
+      allow create, update, delete: if isAdmin() && isValidId(panelId) && isValidPanel();
+    }
+
+    function isValidPanel() {
+      let data = incoming();
+      return data.id is string && data.id.size() <= 128 &&
+             data.brandName is string && data.brandName.size() <= 256 &&
+             data.description is string && data.description.size() <= 1024 &&
+             data.url is string && data.url.size() <= 1024 &&
+             data.rank is int && data.rank >= 1 && data.rank <= 100 &&
+             data.rating is number && data.rating >= 0 && data.rating <= 5;
+    }
+
+    // -----------------------------------------------------
+    // LEADS collection: /leads/{leadId}
+    // Anyone can create a lead through the reward campaign.
+    // Admins can read or update leads.
+    // -----------------------------------------------------
+    match /leads/{leadId} {
+      allow create: if isValidId(leadId) && isValidLead();
+      allow get: if isAdmin();
+      allow list: if isAdmin();
+      allow update, delete: if isAdmin();
+    }
+
+    function isValidLead() {
+      let data = incoming();
+      return data.id is string && data.id.size() <= 128 &&
+             data.email is string && data.email.size() <= 256 && data.email.matches('^.+@.+\\..+$') &&
+             data.panelId is string && data.panelId.size() <= 128 &&
+             data.panelName is string && data.panelName.size() <= 256 &&
+             data.claimedAt is string && data.claimedAt.size() <= 128 &&
+             data.status in ['pending', 'verified', 'completed'];
+    }
+
+    // -----------------------------------------------------
+    // CRMSETTINGS collection: /crmSettings/{settingsId} singleton
+    // Only Admin can configure CRM settings.
+    // -----------------------------------------------------
+    match /crmSettings/{settingsId} {
+      allow read: if true;
+      allow write: if isAdmin() && isValidCrmSettings();
+    }
+
+    function isValidCrmSettings() {
+      let data = incoming();
+      return data.crmFormat in ['json', 'form'] &&
+             data.companyName is string && data.companyName.size() <= 256 &&
+             data.doubleOptInDisclaimer is bool;
+    }
+
+    // -----------------------------------------------------
+    // LOGS collection: /logs/{logId}
+    // Only Admin can read logs. Anyone can write logs (when trigger runs).
+    // -----------------------------------------------------
+    match /logs/{logId} {
+      allow read: if isAdmin();
+      allow create: if isValidId(logId) && isValidLog();
+      allow update, delete: if isAdmin();
+    }
+
+    function isValidLog() {
+      let data = incoming();
+      return data.id is string && data.id.size() <= 128 &&
+             data.action is string && data.action.size() <= 256 &&
+             data.details is string && data.details.size() <= 2048 &&
+             data.status in ['success', 'warning', 'error'] &&
+             data.timestamp is string && data.timestamp.size() <= 128;
+    }
+
+    // -----------------------------------------------------
+    // STATS collection: /stats/{statsId} singleton
+    // Anyone can read stats. Admins can update stats.
+    // -----------------------------------------------------
+    match /stats/{statsId} {
+      allow read: if true;
+      allow write: if isAdmin() && isValidStats();
+    }
+
+    function isValidStats() {
+      let data = incoming();
+      return data.liveConversions is int &&
+             data.conversionChangePercent is number &&
+             data.epcAverage is number &&
+             data.epcChangeAmount is number &&
+             data.activeIngestors is int &&
+             data.systemUptime is number;
+    }
+  }
+}

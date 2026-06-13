@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Prevent read-only Window fetch errors from automated environments -->
+  <script>
+    (function() {
+      try {
+        let currentFetch = window.fetch;
+        Object.defineProperty(window, 'fetch', {
+          get() { return currentFetch; },
+          set(value) { currentFetch = value; },
+          configurable: true,
+          enumerable: true
+        });
+      } catch (e) {
+        console.warn("Fetch shim bypass:", e);
+      }
+    })();
+  </script>
+  <!-- Strictly excluded from crawlers to protect advertiser links -->
+  <meta name="robots" content="noindex, nofollow">
+  <title>Your Curated Rewards Catalog | DoggSpace</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;750&family=Sora:wght@700;800&family=JetBrains+Mono:wght@500;750&display=swap" rel="stylesheet">
+
+  <style>
+    /* MASTER DESIGN VARIABLES */
+    :root {
+      --bg: #040914;
+      --surface: #0B1220;
+      --surface2: #111C30;
+      --gold: #F5A623;
+      --gold-dark: #C47F10;
+      --white: #F0F6FF;
+      --muted: rgba(240, 246, 255, 0.52);
+      --subtle: rgba(255, 255, 255, 0.06);
+      --green: #10B981;
+      --purple: #8B5CF6;
+      --radius: 12px;
+      --radius-lg: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--white);
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* Sticky Nav */
+    nav {
+      position: sticky;
+      top: 0;
+      width: 100%;
+      height: 70px;
+      background: rgba(4, 9, 20, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 2rem;
+      z-index: 100;
+    }
+
+    .logo {
+      font-family: 'Sora', sans-serif;
+      font-weight: 800;
+      font-size: 1.4rem;
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .logo span {
+      color: var(--gold);
+    }
+
+    .nav-stats {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .nav-badge {
+      background: var(--surface2);
+      border: 1px solid var(--subtle);
+      font-weight: 700;
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 0.35rem 0.85rem;
+      border-radius: 99px;
+      color: var(--gold);
+    }
+
+    /* Header banner styling */
+    header {
+      max-width: 1200px;
+      margin: 3rem auto 1rem auto;
+      padding: 0 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    /* DOI Alert confirmation Banner */
+    .doi-banner {
+      display: none; /* Auto shown dynamically */
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      border-radius: var(--radius);
+      padding: 1.25rem 2rem;
+      color: var(--green);
+      font-size: 0.92rem;
+      align-items: center;
+      gap: 1rem;
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .doi-circle-check {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--green);
+      color: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.8rem;
+    }
+
+    .header-box {
+      background: var(--surface);
+      border: 1px solid var(--subtle);
+      border-radius: var(--radius-lg);
+      padding: 3rem 2.5rem;
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    @media (max-width: 850px) {
+      .header-box {
+        grid-template-columns: 1fr;
+        padding: 2rem 1.5rem;
+      }
+    }
+
+    .header-left h1 {
+      font-family: 'Sora', sans-serif;
+      font-size: 2.1rem;
+      font-weight: 800;
+      color: #FFFFFF;
+      margin-bottom: 0.5rem;
+    }
+
+    .header-left p {
+      color: var(--muted);
+      font-size: 0.98rem;
+      max-width: 600px;
+    }
+
+    /* Quick indicators */
+    .tracker-metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    .metric-bubble {
+      background: var(--surface2);
+      border: 1px solid var(--subtle);
+      padding: 1rem 1.25rem;
+      border-radius: var(--radius);
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .metric-bubble .label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.5px;
+    }
+
+    .metric-bubble .val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.4rem;
+      font-weight: 750;
+      color: var(--gold);
+    }
+
+    /* Category Navigation bar Tab selectors */
+    .catalog-section {
+      max-width: 1200px;
+      margin: 2.5rem auto;
+      padding: 0 2rem;
+    }
+
+    .tab-bar {
+      display: flex;
+      gap: 0.75rem;
+      border-bottom: 1.5px solid var(--subtle);
+      padding-bottom: 0.8rem;
+      margin-bottom: 2rem;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      font-family: 'Sora', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--muted);
+      padding: 0.6rem 1.25rem;
+      cursor: pointer;
+      border-radius: 99px;
+      transition: all 0.25s;
+    }
+
+    .tab-btn:hover {
+      color: #FFFFFF;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .tab-btn.active {
+      background: var(--gold);
+      color: var(--bg);
+    }
+
+    /* Offers comparison Card Grid */
+    .offers-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+    }
+
+    @media (max-width: 968px) {
+      .offers-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .offers-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Offer card styles */
+    .offer-card {
+      background: var(--surface);
+      border: 1px solid var(--subtle);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      position: relative;
+      transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+    }
+
+    .offer-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(245, 166, 35, 0.3);
+      box-shadow: 0 10px 25px rgba(245, 166, 35, 0.08);
+    }
+
+    .offer-image-box {
+      width: 100%;
+      height: 155px;
+      overflow: hidden;
+      background: var(--surface2);
+      position: relative;
+    }
+
+    .offer-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s;
+    }
+
+    .offer-card:hover .offer-image {
+      transform: scale(1.05);
+    }
+
+    .offer-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #02050c;
+      border: 1px solid rgba(245, 166, 35, 0.4);
+      color: var(--gold);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.3rem 0.7rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .offer-content {
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      flex-grow: 1;
+    }
+
+    .offer-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.76rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .network-badge {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--green);
+    }
+
+    .offer-title {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.15rem;
+      line-height: 1.35;
+      color: #FFFFFF;
+      font-weight: 800;
+    }
+
+    .offer-desc {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.5;
+      flex-grow: 1; /* Pushes button downwards */
+    }
+
+    /* Payout banner row inside card */
+    .payout-strip {
+      background: var(--surface2);
+      border-radius: 6px;
+      padding: 0.65rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+    }
+
+    .payout-strip .label {
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .payout-strip .amount {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--gold);
+      font-weight: 750;
+      font-size: 0.95rem;
+    }
+
+    /* Claim button inside card */
+    .claim-btn {
+      background: var(--white);
+      color: var(--bg);
+      font-family: 'Sora', sans-serif;
+      font-weight: 700;
+      font-size: 0.88rem;
+      border: none;
+      padding: 0.85rem;
+      border-radius: var(--radius);
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    .claim-btn:hover {
+      background: var(--gold);
+      color: var(--bg);
+    }
+
+    /* Loading placeholder and skeleton */
+    .loader-box {
+      text-align: center;
+      padding: 4rem 2rem;
+      background: var(--surface);
+      border: 1px solid var(--subtle);
+      border-radius: var(--radius-lg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .spinner {
+      width: 44px;
+      height: 44px;
+      border: 3.5px solid var(--surface2);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 1s infinite linear;
+    }
+
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+
+    /* TRUST Section explaining terms, policies, compliance */
+    .trust-section {
+      max-width: 1200px;
+      margin: 4rem auto;
+      padding: 0 2rem;
+    }
+
+    .trust-box {
+      background: var(--surface);
+      border: 1px solid var(--subtle);
+      border-radius: var(--radius-lg);
+      padding: 3rem;
+    }
+
+    @media (max-width: 600px) {
+      .trust-box {
+        padding: 1.5rem;
+      }
+    }
+
+    .trust-title {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #FFFFFF;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .trust-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2.5rem;
+    }
+
+    @media (max-width: 850px) {
+      .trust-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+    }
+
+    .trust-col {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .trust-item-title {
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--white);
+    }
+
+    .trust-item-desc {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* Footer */
+    footer {
+      background: #02050c;
+      border-top: 1px solid var(--subtle);
+      padding: 3rem 2rem;
+      text-align: center;
+      font-size: 0.76rem;
+      color: var(--muted);
+    }
+  </style>
+
+  <!-- canvas-confetti library for claim celebrations -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+
+  <!-- Sticky Nav -->
+  <nav>
+    <a href="/" class="logo">
+      <span>Dogg</span>Space
+    </a>
+    <div class="nav-stats">
+      <div class="nav-badge">📦 US/Canada Catalog 2026</div>
+    </div>
+  </nav>
+
+  <!-- Header Section -->
+  <header>
+    <!-- DOI confirmed notification banner -->
+    <div class="doi-banner" id="doi-banner-alert">
+      <div class="doi-circle-check">&check;</div>
+      <div>
+        <strong>Double Opt-In Confirmed!</strong> Your mailbox ownership is successfully verified and eligibility status set to active. Handpicked reward campaigns unlocked below.
+      </div>
+    </div>
+
+    <!-- Main visual greeting card -->
+    <div class="header-box">
+      <div class="header-left">
+        <h1>Your handpicked reward matches</h1>
+        <p>
+          We query available advertising networks in real-time. Review the comparison configurations below and select specific offers to claim yours. Zero credit catches.
+        </p>
+      </div>
+
+      <div class="tracker-metrics-grid">
+        <div class="metric-bubble">
+          <span class="label">Open catalog items</span>
+          <span class="val" id="catalog-count-bubble">10 Real</span>
+        </div>
+        <div class="metric-bubble">
+          <span class="label">Total payout value</span>
+          <span class="val">$24.15</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Catalog section tabs and offer blocks -->
+  <main class="catalog-section">
+    <!-- Category Tabs -->
+    <div class="tab-bar">
+      <button class="tab-btn active" id="tab0" onclick="filterCatalog(0)">⭐ All Rewards</button>
+      <button class="tab-btn" id="tab1" onclick="filterCatalog(1)">📦 Hand-Curated Samples</button>
+      <button class="tab-btn" id="tab2" onclick="filterCatalog(2)">💸 Free Entries & Sweepstakes</button>
+    </div>
+
+    <!-- Loading screen placeholder -->
+    <div class="loader-box" id="catalog-loader">
+      <div class="spinner"></div>
+      <p style="font-size: 0.9rem; color: var(--muted)">Matching campaign codes. Connecting secure trackers...</p>
+    </div>
+
+    <!-- Offer card grid -->
+    <div class="offers-grid" id="catalog-offers" style="display: none;">
+      <!-- Catalog items dynamically populated -->
+    </div>
+  </main>
+
+  <!-- Transparency trust card section -->
+  <section class="trust-section">
+    <div class="trust-box">
+      <div class="trust-title">
+        🛡️ Transparency & Safety Console
+      </div>
+
+      <div class="trust-grid">
+        <!-- Col 1 -->
+        <div class="trust-col">
+          <div class="trust-item-title">We process referral commissions</div>
+          <div class="trust-item-desc">
+            DoggSpace operates on a zero-subscription structure. When you take action and participate in specific third-party campaigns linked in our directory (such as registering for Maybelline tests or Tide draws), we receive commission compensation from sponsoring advertisers. These commissions finance our strict background checks, ensuring registrations remain catalog-free.
+          </div>
+        </div>
+
+        <!-- Col 2 -->
+        <div class="trust-col">
+          <div class="trust-item-title">Qualification Disclaimers</div>
+          <div class="trust-item-desc">
+            All details surrounding cosmetic test bundles, home snacks, and sweepstakes values are provided entirely for comparison and information contexts. Because DoggSpace does not manufacture or physically ship individual sample packages ourselves, final qualifications and prize dispersals are completely regulated by external advertisers. Allocations are restricted by local sponsor stocks.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2026 DoggSpace Funnels. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // Unsplash keyword to image mappings to keep visualizations realistic
+    const keywordImages = {
+      'free sample box products colorful': 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?q=30&w=400&auto=format&fit=crop',
+      'Maybelline makeup cosmetics set colorful': 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=30&w=400&auto=format&fit=crop',
+      'healthy snack box food samples': 'https://images.unsplash.com/photo-1505576399279-565b52d4ac71?q=30&w=400&auto=format&fit=crop',
+      'pistachio chocolate luxury Dubai bar': 'https://images.unsplash.com/photo-1511381939415-e44015466834?q=30&w=400&auto=format&fit=crop',
+      'product testing panel samples variety': 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=30&w=400&auto=format&fit=crop',
+      'Amazon gift card shopping prize': 'https://images.unsplash.com/photo-1523474253046-8cd2748b5fd2?q=30&w=400&auto=format&fit=crop',
+      'Walmart gift card prize winner': 'https://images.unsplash.com/photo-1580793241553-e9f1cbb1d310?q=30&w=400&auto=format&fit=crop',
+      'Tide laundry detergent household products': 'https://images.unsplash.com/photo-1563453392212-326f5e854473?q=30&w=400&auto=format&fit=crop',
+      'Pampers baby products family': 'https://images.unsplash.com/photo-1515488042361-404e9250afef?q=30&w=400&auto=format&fit=crop',
+      'Bose headphones premium audio': 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=30&w=400&auto=format&fit=crop'
+    };
+
+    let allOffers = [];
+    let activeFilter = 0; // 0 = all, 1 = tier 1, 2 = tier 2
+
+    // Read URL check params
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('confirmed') === '1') {
+      document.getElementById('doi-banner-alert').style.display = 'flex';
+    }
+
+    // Exponential Backoff retry network fetcher
+    async function fetchOffersWithRetry(retries = 3, delay = 500) {
+      try {
+        const response = await fetch('/api/offers');
+        if (!response.ok) {
+          throw new Error(`Failed to query database catalog. Status: ${response.status}`);
+        }
+        return await response.json();
+      } catch (err) {
+        if (retries > 0) {
+          console.warn(`Network retry active. Retries remaining: ${retries}. Delaying ${delay}ms...`);
+          await new Promise(res => setTimeout(res, delay));
+          return fetchOffersWithRetry(retries - 1, delay * 2);
+        }
+        throw err;
+      }
+    }
+
+    // Initialize catalog list
+    window.addEventListener('DOMContentLoaded', () => {
+      fetchOffersWithRetry()
+        .then(data => {
+          allOffers = data;
+          document.getElementById('catalog-loader').style.display = 'none';
+          document.getElementById('catalog-offers').style.display = 'grid';
+          document.getElementById('catalog-count-bubble').textContent = `${data.length} Real`;
+          renderOffers();
+        })
+        .catch(err => {
+          console.error("Critical matching failure loading catalog:", err);
+          const loader = document.getElementById('catalog-loader');
+          loader.innerHTML = `
+            <p style="color:#F87171; font-weight:700;">⚠ Failed to connect to offer database.</p>
+            <p style="font-size:0.8rem; color:var(--muted)">Ensure local server execution logs are running without exceptions.</p>
+            <button onclick="window.location.reload()" class="claim-btn" style="margin-top:1rem; width:fit-content; border:1px solid #F5A623; color:#F5A623; background:none;">Retry Connection</button>
+          `;
+        });
+    });
+
+    // Render cards filtered by Active Tier tab
+    function renderOffers() {
+      const container = document.getElementById('catalog-offers');
+      container.innerHTML = '';
+
+      const filtered = allOffers.filter(off => {
+        if (activeFilter === 0) return true;
+        return off.tier === activeFilter;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div style="grid-column: 1/-1; text-align:center; padding:3rem; color:var(--muted)">
+            <p>No verified promo campaigns found matching this tier filters currently.</p>
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(item => {
+        // Find suitable Unsplash matching photo from mapping dictionary
+        const imgUrl = keywordImages[item.image_keyword] || 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?q=30&w=400&auto=format&fit=crop';
+        
+        const cardHtml = `
+          <div class="offer-card" id="offer-card-${item.id}">
+            <div class="offer-image-box">
+              <img src="${imgUrl}" alt="${item.name}" class="offer-image">
+              <span class="offer-badge">${item.badge || 'Ships Free'}</span>
+            </div>
+            <div class="offer-content">
+              <div class="offer-meta">
+                <span class="network-badge">${item.network} Verified</span>
+                <span>Type: ${item.cpa_type}</span>
+              </div>
+              <h2 class="offer-title">${item.icon} ${item.name}</h2>
+              <p class="offer-desc">${item.description}</p>
+              
+              <div class="payout-strip">
+                <span class="label">Matched EPC Tracker:</span>
+                <span class="amount">$${item.epc.toFixed(2)} Target</span>
+              </div>
+
+              <a href="#" onclick="claimOffer(event, ${item.id}, ${item.offer_id}, '${item.affiliate_link}')" class="claim-btn">
+                ⚡ Claim Reward Now
+              </a>
+            </div>
+          </div>
+        `;
+        container.insertAdjacentHTML('beforeend', cardHtml);
+      });
+    }
+
+    // Tab filter controller
+    function filterCatalog(tier) {
+      activeFilter = tier;
+      document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
+        if (idx === tier) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+      renderOffers();
+    }
+
+    // Click tracker logging handler
+    function claimOffer(e, id, offerId, linkUrl) {
+      e.preventDefault();
+
+      // Fire visual reward celebration confetti
+      confetti({
+        particleCount: 50,
+        spread: 40,
+        origin: { y: 0.8 }
+      });
+
+      // Background tracking POST query logger
+      fetch(`/api/click/${id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      })
+      .then(() => {
+        console.log(`Click event logged in backend DB for offer ID: ${id}`);
+      })
+      .catch((err) => {
+        console.warn("Analytics ping error ignored to protect experience:", err);
+      })
+      .finally(() => {
+        // Safely redirect user to final MaxBounty destination link
+        window.open(linkUrl || 'https://www.maxbounty.com', '_blank');
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Prevent read-only Window fetch errors from automated environments -->
+  <script>
+    (function() {
+      try {
+        let currentFetch = window.fetch;
+        Object.defineProperty(window, 'fetch', {
+          get() { return currentFetch; },
+          set(value) { currentFetch = value; },
+          configurable: true,
+          enumerable: true
+        });
+      } catch (e) {
+        console.warn("Fetch shim bypass:", e);
+      }
+    })();
+  </script>
+  <meta name="robots" content="index, nofollow">
+  <title>Terms of Service | DoggSpace</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #040914;
+      --surface: #0B1220;
+      --surface2: #111C30;
+      --gold: #F5A623;
+      --white: #F0F6FF;
+      --muted: rgba(240, 246, 255, 0.52);
+      --subtle: rgba(255, 255, 255, 0.06);
+      --radius: 14px;
+      --radius-lg: 22px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--white);
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+      line-height: 1.7;
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      width: 100%;
+      height: 70px;
+      background: rgba(4, 9, 20, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 2rem;
+      z-index: 100;
+    }
+
+    .logo {
+      font-family: 'Sora', sans-serif;
+      font-weight: 800;
+      font-size: 1.35rem;
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .logo span {
+      color: var(--gold);
+    }
+
+    .nav-link {
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+
+    .nav-link:hover {
+      color: var(--gold);
+    }
+
+    main {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 4rem 2rem;
+    }
+
+    .policy-container {
+      background: var(--surface);
+      border: 1px solid var(--subtle);
+      border-radius: var(--radius-lg);
+      padding: 3rem;
+    }
+
+    @media (max-width: 600px) {
+      .policy-container {
+        padding: 1.5rem;
+      }
+    }
+
+    h1 {
+      font-family: 'Sora', sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+      color: #FFFFFF;
+      margin-bottom: 0.5rem;
+    }
+
+    .last-updated {
+      font-size: 0.85rem;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 2.5rem;
+    }
+
+    h2 {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.25rem;
+      color: #FFFFFF;
+      margin: 2rem 0 1rem;
+    }
+
+    p {
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+    }
+
+    footer {
+      background: #02050c;
+      border-top: 1px solid var(--subtle);
+      padding: 3rem 2rem;
+      text-align: center;
+      font-size: 0.76rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="/" class="logo">
+      <span>Dogg</span>Space
+    </a>
+    <a href="/" class="nav-link">&larr; Back to home</a>
+  </nav>
+
+  <main>
+    <div class="policy-container">
+      <h1>Terms of Service</h1>
+      <div class="last-updated">Last Updated: June 13, 2026</div>
+
+      <p>
+        These Terms of Service govern your access and use of the DoggSpace website, emails, rewards dashboard, and curation directories. By signing up, subscribing, or interacting with our affiliate links, you agree to these Terms. If you do not agree, please do not use our services.
+      </p>
+
+      <h2>1. Nature of Our Service</h2>
+      <p>
+        DoggSpace is an independent rewards locator, matching platform, and educational newsletter. We curate and reference external rewards campaigns (e.g. MaxBounty CPA listings). **We are not manufacturer or direct fulfillment shippers** of sample product boxes. When claiming rewards, you understand that your final qualification is regulated entirely by external advertisers who sponsor these campaigns.
+      </p>
+
+      <h2>2. FTC Disclosures & Referral Fees</h2>
+      <p>
+        In compliance with federal marketing Guidelines, you are herby notified that **DoggSpace receives commission compensation** when users click out and participate in specific third-party listings on our directory. These tracking referral commissions fund our editorial screening processes, keeping registrations 100% free for subscribers.
+      </p>
+
+      <h2>3. Qualification Disclaimers</h2>
+      <p>
+        Descriptions of sample packages, cosmetics kits, tech accessories, and snack boxes are supplied solely for informational contexts. While we manual screen for legitimacy:
+      </p>
+      <ul>
+        <p style="margin-top: 0.5rem;">Sample allocations are never 100% guaranteed. Physical distributions are limited by local sponsor stock, age parameters, and geographical restrictions. Draw items and sweepstakes are designated as random selection, free-to-enter draws with no guarantee of payouts.</p>
+      </ul>
+
+      <h2>4. Prohibited Use Cases</h2>
+      <p>
+        To preserve network safety, you agree not to submit fraudulent or programmatic email registers (bots), artificial scripts, duplicate profiles, or spoofed IP values. We reserves the right to lock basic auth credentials and ban IPs violating these guidelines.
+      </p>
+
+      <h2>5. Limitations of Liability</h2>
+      <p>
+        We are not responsible for damages, physical side effects of tested materials, or billing disputes resulting from outer advertiser gateways. You claim external offers at your own discretion.
+      </p>
+
+      <h2>6. Governing Law</h2>
+      <p>
+        These terms shall be governed under federal and state jurisdictions of Florida, United States, without reference to conflict of laws parameters.
+      </p>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 DoggSpace Funnels. All rights reserved.</p>
+  </footer>
+
+</body>
+</html>

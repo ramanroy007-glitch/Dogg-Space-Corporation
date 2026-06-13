@@ -1,0 +1,6 @@
+{
+  "name": "VerifySecure",
+  "description": "SampleNation email marketing funnel featuring secure DOI flow, high performance offer bridge, and admin manager.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

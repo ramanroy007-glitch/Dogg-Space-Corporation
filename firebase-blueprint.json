@@ -1,0 +1,103 @@
+{
+  "entities": {
+    "Panel": {
+      "title": "Panel",
+      "description": "Information about a reward brand panel and affiliate configuration.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "rank": { "type": "integer" },
+        "brandName": { "type": "string" },
+        "rating": { "type": "number" },
+        "description": { "type": "string" },
+        "url": { "type": "string" },
+        "isClaimed": { "type": "boolean" },
+        "visualTheme": {
+          "type": "object",
+          "properties": {
+            "gradientStart": { "type": "string" },
+            "gradientEnd": { "type": "string" },
+            "icon": { "type": "string" }
+          }
+        }
+      },
+      "required": ["id", "rank", "brandName", "rating", "description", "url"]
+    },
+    "Lead": {
+      "title": "Lead",
+      "description": "Consumer claim registrations captured via rewarded landing pages.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "email": { "type": "string" },
+        "fullName": { "type": "string" },
+        "panelId": { "type": "string" },
+        "panelName": { "type": "string" },
+        "claimedAt": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "verified", "completed"] }
+      },
+      "required": ["id", "email", "panelId", "panelName", "claimedAt", "status"]
+    },
+    "CrmSettings": {
+      "title": "CrmSettings",
+      "description": "Configuration for external CRM systems integration like webhooks and formatting.",
+      "type": "object",
+      "properties": {
+        "webhookUrl": { "type": "string" },
+        "crmFormat": { "type": "string", "enum": ["json", "form"] },
+        "companyName": { "type": "string" },
+        "doubleOptInDisclaimer": { "type": "boolean" }
+      },
+      "required": ["webhookUrl", "crmFormat", "companyName", "doubleOptInDisclaimer"]
+    },
+    "AutomationLog": {
+      "title": "AutomationLog",
+      "description": "Audit trails for rank changes, lead generation, and CRM submissions.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "timestamp": { "type": "string" },
+        "action": { "type": "string" },
+        "details": { "type": "string" },
+        "status": { "type": "string", "enum": ["success", "warning", "error"] }
+      },
+      "required": ["id", "timestamp", "action", "details", "status"]
+    },
+    "Stats": {
+      "title": "Stats",
+      "description": "Performance parameters of the lead ingestion and tracking engine.",
+      "type": "object",
+      "properties": {
+        "liveConversions": { "type": "integer" },
+        "conversionChangePercent": { "type": "number" },
+        "epcAverage": { "type": "number" },
+        "epcChangeAmount": { "type": "number" },
+        "activeIngestors": { "type": "integer" },
+        "systemUptime": { "type": "number" }
+      },
+      "required": ["liveConversions", "conversionChangePercent", "epcAverage", "epcChangeAmount", "activeIngestors", "systemUptime"]
+    }
+  },
+  "firestore": {
+    "panels/{panelId}": {
+      "schema": "Panel",
+      "description": "Stores current dynamic rewarded brand panels."
+    },
+    "leads/{leadId}": {
+      "schema": "Lead",
+      "description": "Stores rewarded consumer lead capture events."
+    },
+    "crmSettings/global": {
+      "schema": "CrmSettings",
+      "description": "Singleton configuration for active webhook formatters."
+    },
+    "logs/{logId}": {
+      "schema": "AutomationLog",
+      "description": "Stores live ingestion and sync operation logs."
+    },
+    "stats/global": {
+      "schema": "Stats",
+      "description": "Singleton performance indexes compiled by trackers."
+    }
+  }
+}
