@@ -2,18 +2,18 @@ version: "3.9"
 services:
   app:
     build: .
-    container_name: doggspace
+    container_name: honestperks
     restart: unless-stopped
     ports:
       - "3000:3000"
     env_file:
       - .env
     volumes:
-      - doggspace_data:/app/data
+      - honestperks_data:/app/data
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:3000/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
 volumes:
-  doggspace_data:
+  honestperks_data:

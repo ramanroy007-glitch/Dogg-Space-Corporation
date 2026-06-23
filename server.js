@@ -14,6 +14,9 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Tell Express to trust the reverse proxy headers (e.g., Cloud Run, Nginx, etc.)
+app.set("trust proxy", 1);
+
 // Hardened security headers compatible with iframe rendering in AI Studio
 app.use(helmet({
   frameguard: false, // Allow iframe rendering in AI Studio
@@ -56,7 +59,7 @@ const dataDir = process.env.DATA_DIR || "./data";
 if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
 }
-const dbPath = path.join(dataDir, "doggspace.db");
+const dbPath = path.join(dataDir, "honestperks.db");
 
 const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
@@ -86,7 +89,7 @@ db.serialize(() => {
   db.run(`CREATE INDEX IF NOT EXISTS idx_subscribers_email ON subscribers(email)`);
   db.run(`CREATE INDEX IF NOT EXISTS idx_subscribers_created ON subscribers(created_at)`);
 
-  // 2. Offers comparison matrix table
+  // 2. Offers comparison matrix table (with image_url, email_subject and email_body columns)
   db.run(`
     CREATE TABLE IF NOT EXISTS offers (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -102,12 +105,20 @@ db.serialize(() => {
       badge TEXT,
       icon TEXT DEFAULT '🎁',
       image_keyword TEXT DEFAULT 'free sample box',
+      image_url TEXT,
+      email_subject TEXT,
+      email_body TEXT,
       active INTEGER DEFAULT 1,
       position INTEGER DEFAULT 99,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
   db.run(`CREATE INDEX IF NOT EXISTS idx_offers_status_pos ON offers(active, position)`);
+
+  // Safe schema migrations for existing databases that might be missing newly required columns
+  db.run("ALTER TABLE offers ADD COLUMN image_url TEXT", [], () => {});
+  db.run("ALTER TABLE offers ADD COLUMN email_subject TEXT", [], () => {});
+  db.run("ALTER TABLE offers ADD COLUMN email_body TEXT", [], () => {});
 
   // 3. Click analytics logs Table
   db.run(`
@@ -132,8 +143,9 @@ db.serialize(() => {
   db.get("SELECT COUNT(*) as count FROM settings", [], (err, row) => {
     if (!err && row && row.count === 0) {
       const stmt = db.prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)");
-      stmt.run("brand_name", "DoggSpace");
-      stmt.run("sending_domain", "doggspace.com");
+      stmt.run("brand_name", "HonestPerks");
+      stmt.run("sending_domain", "honestperks.com");
+      stmt.run("google_client_id", process.env.GOOGLE_CLIENT_ID || "");
       stmt.run("brevo_webhook", process.env.BREVO_WEBHOOK || "");
       stmt.run("activecampaign_webhook", process.env.ACTIVECAMPAIGN_WEBHOOK || "");
       stmt.run("convertkit_webhook", process.env.CONVERTKIT_WEBHOOK || "");
@@ -142,6 +154,9 @@ db.serialize(() => {
       stmt.run("google_analytics_id", "");
       stmt.run("pinterest_tag_id", "");
       stmt.finalize();
+    } else {
+      // Self-healing migration to insert google_client_id key if missing
+      db.run("INSERT OR IGNORE INTO settings (key, value) VALUES ('google_client_id', ?)", [process.env.GOOGLE_CLIENT_ID || ""]);
     }
   });
 
@@ -152,27 +167,44 @@ db.serialize(() => {
       const stmt = db.prepare(`
         INSERT INTO offers (
           offer_id, name, network, cpa_type, payout, epc, tier, 
-          affiliate_link, description, badge, icon, image_keyword, active, position
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          affiliate_link, description, badge, icon, image_keyword, image_url, active, position
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `);
 
       // Tier 1 Offers - Physical Ships
-      stmt.run("24224", "DoggSpace Goodie Box", "MaxBounty", "DOI", 1.50, 0.12, 1, "https://www.maxbounty.com", "Receive premium, hand-curated sampler box packages completely filled with full-sized name-brand items. Dispatched directly to doors in the US and Canada totally free. Zero credit requirements or shipping catches.", "Ships Free 📦", "📦", "free sample box products colorful", 1, 1);
-      stmt.run("24725", "Maybelline Tester Crew", "MaxBounty", "SOI", 3.00, 0.30, 1, "https://www.maxbounty.com", "Get recruited into the official Maybelline beauty tester squad. Sponsoring advertisers dispatch premium cosmetic sets featuring professional-grade lipstick, eyeliner, and foundations to keep in exchange for your evaluation reviews.", "Top Payout 💄", "💄", "Maybelline makeup cosmetics set colorful", 1, 2);
-      stmt.run("25012", "Organic Snack Crate", "MaxBounty", "DOI", 1.50, 0.14, 1, "https://www.maxbounty.com", "Satisfy immediate cravings with a massive snack box packed full with verified gluten-free and healthy organic brand bites. Includes fast tracking delivery links, families feedback requested.", "Healthy Bites 🍫", "🍫", "healthy snack box food samples", 1, 3);
-      stmt.run("29392", "Viral Dubai Chocolate", "MaxBounty", "SOI", 2.40, 0.24, 1, "https://www.maxbounty.com", "Claim of a luxury organic pistachio-filled viral Dubai chocolate bar from the world's most premium confectionery. Evaluators selected daily to test and taste without cost constraints.", "Viral Trend 🔥", "🔥", "pistachio chocolate luxury Dubai bar", 1, 4);
-      stmt.run("24540", "Product Testing Panel", "MaxBounty", "DOI", 1.25, 0.17, 1, "https://www.maxbounty.com", "Get immediate premium dashboard credentials. Earn persistent access testing general house items, pet releases, and smart home appliances. Keep every product you review.", "Review & Keep 🧪", "🧪", "product testing panel samples variety", 1, 5);
+      stmt.run("24224", "HonestPerks Goodie Box", "MaxBounty", "DOI", 1.50, 0.12, 1, "https://www.maxbounty.com", "Receive premium, hand-curated sampler box packages completely filled with full-sized name-brand items. Dispatched directly to doors in the US and Canada totally free. Zero credit requirements or shipping catches.", "Ships Free 📦", "📦", "free sample box", "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=600", 1, 1);
+      stmt.run("24725", "Maybelline Tester Crew", "MaxBounty", "SOI", 3.00, 0.30, 1, "https://www.maxbounty.com", "Get recruited into the official Maybelline beauty tester squad. Sponsoring advertisers dispatch premium cosmetic sets featuring professional-grade lipstick, eyeliner, and foundations to keep in exchange for your evaluation reviews.", "Top Payout 💄", "💄", "makeup cosmetics", "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&q=80&w=600", 1, 2);
+      stmt.run("25012", "Organic Snack Crate", "MaxBounty", "DOI", 1.50, 0.14, 1, "https://www.maxbounty.com", "Satisfy immediate cravings with a massive snack box packed full with verified gluten-free and healthy organic brand bites. Includes fast tracking delivery links, families feedback requested.", "Healthy Bites 🍫", "🍫", "healthy snack box", "https://images.unsplash.com/photo-1582407947304-fd86f028f716?auto=format&fit=crop&q=80&w=600", 1, 3);
+      stmt.run("29392", "Viral Dubai Chocolate", "MaxBounty", "SOI", 2.40, 0.24, 1, "https://www.maxbounty.com", "Claim of a luxury organic pistachio-filled viral Dubai chocolate bar from the world's most premium confectionery. Evaluators selected daily to test and taste without cost constraints.", "Viral Trend 🔥", "🔥", "pistachio chocolate", "https://images.unsplash.com/photo-1623934522443-673ec485e3fe?auto=format&fit=crop&q=80&w=600", 1, 4);
+      stmt.run("24540", "Product Testing Panel", "MaxBounty", "DOI", 1.25, 0.17, 1, "https://www.maxbounty.com", "Get immediate premium dashboard credentials. Earn persistent access testing general house items, pet releases, and smart home appliances. Keep every product you review.", "Review & Keep 🧪", "🧪", "product testing", "https://images.unsplash.com/photo-1511556532299-8f662fc26c06?auto=format&fit=crop&q=80&w=600", 1, 5);
 
       // Tier 2 Offers - Free Entry Sweepstakes
-      stmt.run("32213", "Amazon $2,000 Promos", "MaxBounty", "CPL", 3.00, 0.30, 2, "https://www.maxbounty.com", "Secure entries to receive a $2,000 allowance gift card code added straight to your active Amazon subscriber profile. Entries require quick surveys.", "Win $2000 🛒", "🛒", "Amazon gift card shopping prize", 1, 6);
-      stmt.run("32214", "Walmart $2,000 Draw", "MaxBounty", "CPL", 3.00, 0.30, 2, "https://www.maxbounty.com", "Participate inside verified sweepstakes campaigns to earn $2,000 in superstore credits usable across any local US storefront. Simple SOI questionnaire.", "Win Walmart 🛒", "🛒", "Walmart gift card prize winner", 1, 7);
-      stmt.run("32212", "Tide Laundry Essentials", "MaxBounty", "CPL", 3.00, 0.30, 2, "https://www.maxbounty.com", "Enter for an active sweepstake opportunity to claim catalogs and premium Tide packages containing $1,000 worth of household cleaning supplies.", "Free Tide 🧺", "🧺", "Tide laundry detergent household products", 1, 8);
-      stmt.run("32211", "Pampers Premium Diapers", "MaxBounty", "CPL", 3.00, 0.30, 2, "https://www.maxbounty.com", "Register contact parameters for full eligibility to receive $1,000 worth of infant, baby, and parent items. Perfect for growing families.", "Family Bundle 👶", "👶", "Pampers baby products family", 1, 9);
-      stmt.run("29389", "Bose Headphones Sweep", "MaxBounty", "SOI", 2.40, 0.24, 2, "https://www.maxbounty.com", "Submit email credentials to enter custom prize draws to claim the ultra-premium AirPods-competing Bose Noise Cancelling headphones.", "Premium Audio 🎧", "🎧", "Bose headphones premium audio", 1, 10);
+      stmt.run("32213", "Amazon $2,000 Promos", "MaxBounty", "CPL", 3.00, 0.30, 2, "https://www.maxbounty.com", "Secure entries to receive a $2,000 allowance gift card code added straight to your active Amazon subscriber profile. Entries require quick surveys.", "Win $2000 🛒", "🛒", "Amazon gift card", "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&q=80&w=600", 1, 6);
+      stmt.run("32214", "Walmart $2,000 Draw", "MaxBounty", "CPL", 3.00, 0.30, 2, "https://www.maxbounty.com", "Participate inside verified sweepstakes campaigns to earn $2,000 in superstore credits usable across any local US storefront. Simple SOI questionnaire.", "Win Walmart 🛒", "🛒", "Walmart gift card", "https://images.unsplash.com/photo-1516594798947-e65505dbb29d?auto=format&fit=crop&q=80&w=600", 1, 7);
+      stmt.run("32212", "Tide Laundry Essentials", "MaxBounty", "CPL", 3.00, 0.30, 2, "https://www.maxbounty.com", "Enter for an active sweepstake opportunity to claim catalogs and premium Tide packages containing $1,000 worth of household cleaning supplies.", "Free Tide 🧺", "🧺", "Tide laundry detergent", "https://images.unsplash.com/photo-1563161402-84119280fc26?auto=format&fit=crop&q=80&w=600", 1, 8);
+      stmt.run("32211", "Pampers Premium Diapers", "MaxBounty", "CPL", 3.00, 0.30, 2, "https://www.maxbounty.com", "Register contact parameters for full eligibility to receive $1,000 worth of infant, baby, and parent items. Perfect for growing families.", "Family Bundle 👶", "👶", "Pampers baby", "https://images.unsplash.com/photo-1555252333-9f8e92e65df9?auto=format&fit=crop&q=80&w=600", 1, 9);
+      stmt.run("29389", "Bose Headphones Sweep", "MaxBounty", "SOI", 2.40, 0.24, 2, "https://www.maxbounty.com", "Submit email credentials to enter custom prize draws to claim the ultra-premium AirPods-competing Bose Noise Cancelling headphones.", "Premium Audio 🎧", "🎧", "Bose headphones", "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=600", 1, 10);
 
       stmt.finalize();
       console.log("Seeding complete!");
     }
+  });
+
+  // Backward-compatible backfill of Unsplash image URLs for preloaded items
+  const backfillMap = {
+    "24224": "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=600",
+    "24725": "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&q=80&w=600",
+    "25012": "https://images.unsplash.com/photo-1582407947304-fd86f028f716?auto=format&fit=crop&q=80&w=600",
+    "29392": "https://images.unsplash.com/photo-1623934522443-673ec485e3fe?auto=format&fit=crop&q=80&w=600",
+    "24540": "https://images.unsplash.com/photo-1511556532299-8f662fc26c06?auto=format&fit=crop&q=80&w=600",
+    "32213": "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&q=80&w=600",
+    "32214": "https://images.unsplash.com/photo-1516594798947-e65505dbb29d?auto=format&fit=crop&q=80&w=600",
+    "32212": "https://images.unsplash.com/photo-1563161402-84119280fc26?auto=format&fit=crop&q=80&w=600",
+    "32211": "https://images.unsplash.com/photo-1555252333-9f8e92e65df9?auto=format&fit=crop&q=80&w=600",
+    "29389": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=600"
+  };
+  Object.keys(backfillMap).forEach(offId => {
+    db.run("UPDATE offers SET image_url = ? WHERE offer_id = ? AND (image_url IS NULL OR image_url = '')", [backfillMap[offId], offId]);
   });
 });
 
@@ -195,7 +227,7 @@ const formLimiter = rateLimit({
 const adminLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 mins
   max: 100, // limit each IP to 100 auth attempts
-  message: { error: "Brute force security lock active. Access frozen for this IP address. retry in 15 minutes." },
+  message: { error: "Brute force security lock active. retry in 15 minutes." },
   standardHeaders: true,
   legacyHeaders: false,
 });
@@ -204,7 +236,7 @@ const adminLimiter = rateLimit({
 const adminAuthMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader) {
-    res.setHeader("WWW-Authenticate", 'Basic realm="DoggSpace Executive Desk"');
+    res.setHeader("WWW-Authenticate", 'Basic realm="HonestPerks Executive Desk"');
     return res.status(401).send("Authentication credentials required to access the admin console.");
   }
 
@@ -218,7 +250,7 @@ const adminAuthMiddleware = (req, res, next) => {
   if (user === adminUser && pass === adminPass) {
     next();
   } else {
-    res.setHeader("WWW-Authenticate", 'Basic realm="DoggSpace Executive Desk"');
+    res.setHeader("WWW-Authenticate", 'Basic realm="HonestPerks Executive Desk"');
     return res.status(401).send("Access Rejected: Incorrect username or password.");
   }
 };
@@ -227,9 +259,122 @@ const publicPath = path.join(process.cwd(), "public");
 
 // --- PUBLIC API ROUTES ---
 
+// Public exposure of configuration properties like Google Client ID
+app.get("/api/config", standardLimiter, (req, res) => {
+  db.get("SELECT value FROM settings WHERE key = 'google_client_id'", [], (err, row) => {
+    const idValue = (row && row.value) || process.env.GOOGLE_CLIENT_ID || "";
+    res.json({
+      google_client_id: idValue.trim()
+    });
+  });
+});
+
+// Google ID Token verification and automated double-opt-in subscription handler
+app.post("/api/auth/google", standardLimiter, (req, res) => {
+  const { credential, utm_source, utm_campaign, utm_medium } = req.body;
+  if (!credential) {
+    return res.status(400).json({ error: "Google credential security token is required." });
+  }
+
+  // Check if this is a simulation token from our sandbox overlay or a real Google token
+  let getGoogleData;
+  if (credential.startsWith("MOCK_GOOGLE_VERIFIED_TOKEN_FOR_")) {
+    const mockEmail = credential.substring("MOCK_GOOGLE_VERIFIED_TOKEN_FOR_".length).trim().toLowerCase();
+    const mockName = mockEmail.includes("raman") ? "Raman Roy" : "Demo Tester";
+    getGoogleData = Promise.resolve({ email: mockEmail, name: mockName });
+  } else {
+    // Securely verify Google JWT token via Google Token Validation HTTPS API
+    getGoogleData = fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(credential)}`)
+      .then(async response => {
+        if (!response.ok) {
+          throw new Error("Failed validation state from Google Auth backend API.");
+        }
+        return response.json();
+      });
+  }
+
+  getGoogleData
+    .then(data => {
+      const email = data.email ? data.email.toString().trim().toLowerCase() : "";
+      const name = data.name ? data.name.toString().trim() : "Google Member";
+
+      if (!email) {
+        return res.status(400).json({ error: "The provided Google profile does not include a verified email address." });
+      }
+
+      const ip = req.ip || req.headers["x-forwarded-for"] || "";
+      const gSource = utm_source ? utm_source.toString().replace(/<[^>]*>/g, "").trim() : "google";
+      const gCampaign = utm_campaign ? utm_campaign.toString().replace(/<[^>]*>/g, "").trim() : "sso";
+      const gMedium = utm_medium ? utm_medium.toString().replace(/<[^>]*>/g, "").trim() : "funnel";
+
+      // Since Google has already verified this email, promote directly to confirmed = 1 (Instant Unlock!)
+      db.get("SELECT id, confirmed FROM subscribers WHERE email = ?", [email], (err, row) => {
+        if (err) {
+          return res.status(500).json({ error: "Failed to query database subscribers." });
+        }
+
+        if (row) {
+          // Exising subscriber: ensure they are promoted to confirmed flag
+          db.run("UPDATE subscribers SET confirmed = 1 WHERE id = ?", [row.id], (updErr) => {
+            if (updErr) {
+              return res.status(500).json({ error: "Could not activate membership status." });
+            }
+            return res.json({ status: "confirmed", email, message: "Welcome back! Google account verified." });
+          });
+        } else {
+          // Safe new subscriber addition directly marked as confirmed (DOI completed upon login!)
+          db.run(
+            `INSERT INTO subscribers (email, name, utm_source, utm_campaign, utm_medium, ip, confirmed) 
+             VALUES (?, ?, ?, ?, ?, ?, 1)`,
+            [email, name, gSource, gCampaign, gMedium, ip],
+            function (insErr) {
+              if (insErr) {
+                console.error("Failed to insert Google Sign-In subscriber:", insErr.message);
+                return res.status(500).json({ error: "Failed to persist subscriber profile." });
+              }
+
+              // Fire programmatic webhooks to external integrations asynchronously
+              db.all("SELECT key, value FROM settings WHERE key LIKE '%_webhook'", [], (errSettings, settingsRows) => {
+                if (!errSettings && settingsRows) {
+                  const hookPayload = {
+                    email,
+                    name,
+                    utm_source: gSource,
+                    utm_campaign: gCampaign,
+                    utm_medium: gMedium,
+                    ip,
+                    source: "honestperks_google_sso",
+                    timestamp: new Date().toISOString()
+                  };
+                  const activeWebhooks = settingsRows.map(r => r.value).filter(val => val && val.startsWith("http"));
+                  Promise.allSettled(
+                    activeWebhooks.map(url => {
+                      return fetch(url, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(hookPayload),
+                        signal: AbortSignal.timeout(4000)
+                      });
+                    })
+                  );
+                }
+              });
+
+              return res.json({ status: "confirmed", email, message: "Google register completed successfully!" });
+            }
+          );
+        }
+      });
+    })
+    .catch(err => {
+      console.error("Token verification exception:", err);
+      return res.status(401).json({ error: "Authenticating with Google failed. Please verify and try again." });
+    });
+});
+
 // Fetch active offers mapped by dynamic position ranks for comparison cards
 app.get("/api/offers", standardLimiter, (req, res) => {
-  db.all("SELECT id, offer_id, name, network, cpa_type, payout, epc, tier, affiliate_link, description, badge, icon, image_keyword, active, position FROM offers WHERE active = 1 ORDER BY position ASC", [], (err, rows) => {
+  db.all("SELECT id, offer_id, name, network, cpa_type, payout, epc, tier, affiliate_link, description, badge, icon, image_keyword, image_url, email_subject, email_body, active, position FROM offers WHERE active = 1 ORDER BY position ASC", [], (err, rows) => {
     if (err) {
       console.error("Failed to query active offers:", err.message);
       return res.status(500).json({ error: "Failed to load matching brand matrices." });
@@ -298,6 +443,63 @@ app.get("/api/confirm", standardLimiter, (req, res) => {
   });
 });
 
+// Dynamic Real-time Email Verification via ZeroBounce or Kickbox APIs
+async function verifyEmail(email, dbSettings) {
+  const verifierService = (dbSettings.email_verifier_service || process.env.EMAIL_VERIFIER_SERVICE || "none").toLowerCase().trim();
+  const zbApiKey = dbSettings.zerobounce_api_key || process.env.ZEROBOUNCE_API_KEY;
+  const kbApiKey = dbSettings.kickbox_api_key || process.env.KICKBOX_API_KEY;
+
+  if (verifierService === "zerobounce" && zbApiKey) {
+    try {
+      const url = `https://api.zerobounce.net/v2/validate?api_key=${encodeURIComponent(zbApiKey)}&email=${encodeURIComponent(email)}`;
+      const response = await fetch(url, { signal: AbortSignal.timeout(5000) });
+      if (!response.ok) {
+        console.error("ZeroBounce API error response status:", response.status);
+        return { valid: true }; // Graceful bypass
+      }
+      const data = await response.json();
+      const status = (data.status || "").toLowerCase();
+      if (["invalid", "spamtrap", "abuse", "do_not_mail"].includes(status)) {
+        return {
+          valid: false,
+          reason: `We could not verify this email address (ZeroBounce status: ${status}). Please use a valid, active email.`
+        };
+      }
+      return { valid: true };
+    } catch (err) {
+      console.error("ZeroBounce validation call failed:", err);
+      return { valid: true }; // Graceful degradation on timeout/failure
+    }
+  }
+
+  if (verifierService === "kickbox" && kbApiKey) {
+    try {
+      const url = `https://api.kickbox.com/v2/verify?email=${encodeURIComponent(email)}&apikey=${encodeURIComponent(kbApiKey)}`;
+      const response = await fetch(url, { signal: AbortSignal.timeout(5000) });
+      if (!response.ok) {
+        console.error("Kickbox API error response status:", response.status);
+        return { valid: true }; // Graceful bypass
+      }
+      const data = await response.json();
+      const result = (data.result || "").toLowerCase();
+      if (result === "undeliverable" || data.disposable === true) {
+        return {
+          valid: false,
+          reason: data.disposable 
+            ? "Temporary or disposable email address detected. Please use a permanent, secure email to receive rewards."
+            : "The provided email address is undeliverable. Please check for spelling mistakes or use another active email."
+        };
+      }
+      return { valid: true };
+    } catch (err) {
+      console.error("Kickbox validation call failed:", err);
+      return { valid: true }; // Graceful degradation on timeout/failure
+    }
+  }
+
+  return { valid: true };
+}
+
 // Core opt-in pipeline endpoint
 app.post("/api/subscribe", formLimiter, (req, res) => {
   let { email, name, utm_source, utm_campaign, utm_medium } = req.body;
@@ -319,14 +521,29 @@ app.post("/api/subscribe", formLimiter, (req, res) => {
     return res.status(400).json({ error: "Invalid email formatting found." });
   }
 
-  if (name.length < 2) {
-    return res.status(400).json({ error: "First name must consist of 2 characters minimum." });
-  }
-
   const ip = req.ip || req.headers["x-forwarded-for"] || "";
 
-  // Check if contact existed on file
-  db.get("SELECT id, confirmed FROM subscribers WHERE email = ?", [email], (err, row) => {
+  // Read all configurations from settings table first
+  db.all("SELECT key, value FROM settings", [], async (errSettings, settingsRows) => {
+    const dbSettings = {};
+    if (!errSettings && settingsRows) {
+      settingsRows.forEach(r => {
+        dbSettings[r.key] = r.value;
+      });
+    }
+
+    try {
+      // Call verifyEmail helper prior to database checks
+      const verification = await verifyEmail(email, dbSettings);
+      if (!verification.valid) {
+        return res.status(400).json({ error: verification.reason });
+      }
+    } catch (verifierErr) {
+      console.error("Email Verifier exception:", verifierErr);
+    }
+
+    // Check if contact existed on file
+    db.get("SELECT id, confirmed FROM subscribers WHERE email = ?", [email], (err, row) => {
     if (err) {
       return res.status(500).json({ error: "Failed to evaluate registry records." });
     }
@@ -360,7 +577,7 @@ app.post("/api/subscribe", formLimiter, (req, res) => {
                 utm_campaign,
                 utm_medium,
                 ip,
-                source: "doggspace",
+                source: "honestperks",
                 timestamp: new Date().toISOString()
               };
 
@@ -390,6 +607,7 @@ app.post("/api/subscribe", formLimiter, (req, res) => {
         }
       );
     }
+    });
   });
 });
 
@@ -405,7 +623,54 @@ app.get("/health", (req, res) => {
 
 // --- ADMIN MANAGER CONSOLE CONTROLS ---
 
-// Retrieve dashboard operational stats
+// Retrieve main single dashboard operational data payload for the admin client
+app.get("/api/admin/data", adminAuthMiddleware, (req, res) => {
+  const data = {
+    offers: [],
+    subscribers: [],
+    stats: { total: 0, today: 0, clicks: 0, offers: 0 },
+    settings: {}
+  };
+
+  db.all("SELECT * FROM offers ORDER BY position ASC, id DESC", [], (errOffers, offers) => {
+    if (offers) data.offers = offers;
+
+    db.all("SELECT id, email, name, utm_source, utm_campaign, utm_medium, ip, confirmed, created_at FROM subscribers ORDER BY created_at DESC LIMIT 200", [], (errSubs, subs) => {
+      if (subs) data.subscribers = subs;
+
+      db.all("SELECT key, value FROM settings", [], (errSettings, settingsRows) => {
+        if (settingsRows) {
+          settingsRows.forEach(r => {
+            data.settings[r.key] = r.value;
+          });
+          // Check if AI keys are enabled
+          data.settings.ai_enabled = !!(data.settings.anthropic_key || process.env.ANTHROPIC_KEY);
+        }
+
+        // Now compile stats variables
+        db.get("SELECT COUNT(*) as count FROM subscribers", [], (e1, r1) => {
+          if (r1) data.stats.total = r1.count;
+
+          db.get("SELECT COUNT(*) as count FROM subscribers WHERE date(created_at) = date('now')", [], (e2, r2) => {
+            if (r2) data.stats.today = r2.count;
+
+            db.get("SELECT COUNT(*) as count FROM clicks", [], (e3, r3) => {
+              if (r3) data.stats.clicks = r3.count;
+
+              db.get("SELECT COUNT(*) as count FROM offers WHERE active = 1", [], (e4, r4) => {
+                if (r4) data.stats.offers = r4.count;
+
+                res.json(data);
+              });
+            });
+          });
+        });
+      });
+    });
+  });
+});
+
+// Retrieve dashboard operational stats alone
 app.get("/api/admin/stats", adminAuthMiddleware, (req, res) => {
   const stats = {
     total_subscribers: 0,
@@ -454,7 +719,7 @@ app.get("/api/admin/subscribers", adminAuthMiddleware, (req, res) => {
 });
 
 // Export CSV pipeline
-app.get("/api/admin/subscribers/export", adminAuthMiddleware, (req, res) => {
+app.get("/api/admin/export", adminAuthMiddleware, (req, res) => {
   db.all("SELECT id, email, name, utm_source, utm_campaign, utm_medium, ip, confirmed, created_at FROM subscribers ORDER BY created_at DESC", [], (err, rows) => {
     if (err) {
       return res.status(500).send("Database extraction failure during compilation.");
@@ -466,9 +731,14 @@ app.get("/api/admin/subscribers/export", adminAuthMiddleware, (req, res) => {
     });
 
     res.setHeader("Content-Type", "text/csv");
-    res.setHeader("Content-Disposition", "attachment; filename=doggspace_leads_export.csv");
+    res.setHeader("Content-Disposition", "attachment; filename=honestperks_leads_export.csv");
     res.send(csvContent);
   });
+});
+
+// Export CSV alias mapping to avoid route mismatching
+app.get("/api/admin/subscribers/export", adminAuthMiddleware, (req, res) => {
+  res.redirect("/api/admin/export");
 });
 
 // Delete subscriber
@@ -494,7 +764,7 @@ app.get("/api/admin/offers", adminAuthMiddleware, (req, res) => {
 
 // Register new offer
 app.post("/api/admin/offers", adminAuthMiddleware, (req, res) => {
-  const { offer_id, name, network, cpa_type, payout, epc, tier, affiliate_link, description, badge, icon, image_keyword, position, active } = req.body;
+  const { offer_id, name, network, cpa_type, payout, epc, tier, affiliate_link, description, badge, icon, image_keyword, image_url, email_subject, email_body, position, active } = req.body;
   
   if (!name || !description || !affiliate_link) {
     return res.status(400).json({ error: "Missing required offer settings fields." });
@@ -503,8 +773,8 @@ app.post("/api/admin/offers", adminAuthMiddleware, (req, res) => {
   db.run(`
     INSERT INTO offers (
       offer_id, name, network, cpa_type, payout, epc, tier, 
-      affiliate_link, description, badge, icon, image_keyword, position, active
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      affiliate_link, description, badge, icon, image_keyword, image_url, email_subject, email_body, position, active
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       offer_id || "", 
       name, 
@@ -518,6 +788,9 @@ app.post("/api/admin/offers", adminAuthMiddleware, (req, res) => {
       badge || "", 
       icon || "🎁", 
       image_keyword || "free sample box", 
+      image_url || "",
+      email_subject || "",
+      email_body || "",
       position || 99, 
       active !== undefined ? active : 1
     ],
@@ -533,22 +806,22 @@ app.post("/api/admin/offers", adminAuthMiddleware, (req, res) => {
 // Update offer parameters
 app.put("/api/admin/offers/:id", adminAuthMiddleware, (req, res) => {
   const { id } = req.params;
-  const { offer_id, name, network, cpa_type, payout, epc, tier, affiliate_link, description, badge, icon, image_keyword, position, active } = req.body;
+  const { offer_id, name, network, cpa_type, payout, epc, tier, affiliate_link, description, badge, icon, image_keyword, image_url, email_subject, email_body, position, active } = req.body;
 
   db.run(`
     UPDATE offers SET 
       offer_id = ?, name = ?, network = ?, cpa_type = ?, payout = ?, epc = ?, 
       tier = ?, affiliate_link = ?, description = ?, badge = ?, icon = ?, 
-      image_keyword = ?, position = ?, active = ?
+      image_keyword = ?, image_url = ?, email_subject = ?, email_body = ?, position = ?, active = ?
     WHERE id = ?`,
     [
       offer_id, name, network, cpa_type, payout, epc, 
       tier, affiliate_link, description, badge, icon, 
-      image_keyword, position, active, id
+      image_keyword, image_url, email_subject, email_body, position, active, id
     ],
     function (err) {
       if (err) {
-        return res.status(500).json({ error: "Failed compilation rewrite: " + err.message });
+        return res.status(500).json({ error: "Failed update execution rewrite: " + err.message });
       }
       res.json({ success: true });
     }
@@ -565,10 +838,10 @@ app.patch("/api/admin/offers/:id/toggle", adminAuthMiddleware, (req, res) => {
 
     const state = row.active === 1 ? 0 : 1;
     db.run("UPDATE offers SET active = ? WHERE id = ?", [state, id], (updateErr) => {
-      if (updateErr) {
-        return res.status(500).json({ error: "Failed to switch active toggle." });
-      }
-      res.json({ success: true, active: state });
+       if (updateErr) {
+         return res.status(500).json({ error: "Failed to switch active toggle." });
+       }
+       res.json({ success: true, active: state });
     });
   });
 });
@@ -630,6 +903,7 @@ app.post("/api/admin/settings/wipe", adminAuthMiddleware, (req, res) => {
   });
 });
 
+
 // --- ANTHROPIC PROXY FOR THE AI COPYWRITER ---
 app.post("/api/admin/writer/generate", adminAuthMiddleware, async (req, res) => {
   const { apiKey, offerName, benefit, tone, stage } = req.body;
@@ -655,7 +929,7 @@ Sequence Stage: ${stage}`;
         model: "claude-3-5-sonnet-20241022",
         max_tokens: 1000,
         temperature: 0.7,
-        system: "You are DoggSpace's chief conversion copywriter. Draft a high-performance email for the selected offer using the specified tone and benefit. Output in raw Markdown with:\n1. Subject line: [Optimized Subject]\n2. Preheader: [Intriguing Preheader]\n3. Body text",
+        system: "You are HonestPerks' chief conversion copywriter. Draft a high-performance email for the selected offer using the specified tone and benefit. Output in raw Markdown with:\n1. Subject line: [Optimized Subject]\n2. Preheader: [Intriguing Preheader]\n3. Body text",
         messages: [
           { role: "user", content: userPrompt }
         ]
@@ -674,6 +948,83 @@ Sequence Stage: ${stage}`;
     console.error("AI Writer generation exception:", error);
     return res.status(500).json({ error: `Server exception: ${error.message}` });
   }
+});
+
+
+// --- NEW ANTHROPIC PROXY FOR AUTO-FILLING OFFERS DETAILS ---
+app.post("/api/admin/ai-generate", adminAuthMiddleware, async (req, res) => {
+  const { name, link, hint } = req.body;
+
+  if (!name) {
+    return res.status(400).json({ error: "Offer name is required to auto-fill details." });
+  }
+
+  // Retrieve Anthropic key first
+  db.get("SELECT value FROM settings WHERE key = 'anthropic_key'", [], async (err, row) => {
+    const apiKey = row ? row.value : process.env.ANTHROPIC_KEY;
+
+    if (!apiKey) {
+      return res.status(400).json({ error: "Anthropic API Key is not configured. Add it in settings first." });
+    }
+
+    const userPrompt = `Offer Name: ${name}
+Affiliate Link: ${link || "None"}
+Existing description/notes hint: ${hint || "None"}`;
+
+    try {
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "x-api-key": apiKey,
+          "anthropic-version": "2023-06-01",
+          "content-type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "claude-3-5-sonnet-20241022",
+          max_tokens: 800,
+          temperature: 0.7,
+          system: `You are HonestPerks' chief conversion copywriter. Auto-generate metadata card and double-opt-in email fields for this offer. 
+Provide your response strictly in valid JSON format. Do not wrap it in any markdown blocks besides raw text or backticks.
+The JSON must have the following keys:
+1. description: a punchy, honest 2-sentence value detailing what they get and why it is free.
+2. badge: a short, catchy, 2-3 word promotional sticker (e.g. "Ships Free 📦", "Win $2000 🛒").
+3. icon: a single highly relevant emoji (e.g. 💄 for makeup, 🧺 for tide).
+4. email_subject: a compelling subject line for the verification / welcome email.
+5. email_body: a direct, honest, 150-word email template welcoming them and explaining how they claim this exact brand box.
+
+Keep descriptions structured cleanly matching HonestPerks standards.`,
+          messages: [
+            { role: "user", content: userPrompt }
+          ]
+        })
+      });
+
+      if (!response.ok) {
+        const errorMsg = await response.text();
+        return res.status(response.status).json({ error: `Anthropic API Request Failed: ${errorMsg}` });
+      }
+
+      const data = await response.json();
+      const text = data.content[0].text;
+
+      // Extract JSON cleanly from text
+      let jsonStr = text.trim();
+      if (jsonStr.startsWith("```json")) {
+        jsonStr = jsonStr.substring(7);
+      }
+      if (jsonStr.endsWith("```")) {
+        jsonStr = jsonStr.substring(0, jsonStr.length - 3);
+      }
+      jsonStr = jsonStr.trim();
+
+      const result = JSON.parse(jsonStr);
+      return res.json(result);
+
+    } catch (error) {
+      console.error("AI Auto-fill exception:", error);
+      return res.status(500).json({ error: `AI process failure: ${error.message}` });
+    }
+  });
 });
 
 
@@ -729,7 +1080,7 @@ const gracefulShutdown = (signal) => {
 };
 
 const server = app.listen(PORT, "0.0.0.0", () => {
-  console.log(`DoggSpace server bootstrapped successfully! Port: ${PORT}`);
+  console.log(`HonestPerks server bootstrapped successfully! Port: ${PORT}`);
 });
 
 process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));

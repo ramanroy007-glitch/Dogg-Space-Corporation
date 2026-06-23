@@ -1,351 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Prevent read-only Window fetch errors from automated environments -->
-  <script>
-    (function() {
-      try {
-        let currentFetch = window.fetch;
-        Object.defineProperty(window, 'fetch', {
-          get() { return currentFetch; },
-          set(value) { currentFetch = value; },
-          configurable: true,
-          enumerable: true
-        });
-      } catch (e) {
-        console.warn("Fetch shim bypass:", e);
-      }
-    })();
-  </script>
-  <!-- STRICTLY excluded from search crawlers -->
-  <meta name="robots" content="noindex">
-  <title>Verifying Allocations | DoggSpace</title>
-
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@700;800&display=swap" rel="stylesheet">
-
-  <style>
-    /* DESIGN TOKENS */
-    :root {
-      --bg: #040914;
-      --surface: #0B1220;
-      --surface2: #111C30;
-      --gold: #F5A623;
-      --white: #F0F6FF;
-      --muted: rgba(240, 246, 255, 0.52);
-      --green: #10B981;
-      --radius-lg: 22px;
-      --radius: 14px;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<!-- Prevent read-only Window fetch errors from automated environments -->
+<script>
+  (function() {
+    try {
+      let currentFetch = window.fetch;
+      Object.defineProperty(window, 'fetch', {
+        get() { return currentFetch; },
+        set(value) { currentFetch = value; },
+        configurable: true,
+        enumerable: true
+      });
+    } catch (e) {
+      console.warn("Fetch shim bypass:", e);
     }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      background-color: var(--bg);
-      color: var(--white);
-      font-family: 'Inter', sans-serif;
-      overflow-x: hidden;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1.5rem;
-      line-height: 1.6;
-    }
-
-    /* Centered Processing Container Card */
-    .thankyou-card {
-      background: var(--surface);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: var(--radius-lg);
-      padding: 3.5rem 2.5rem;
-      max-width: 520px;
-      width: 100%;
-      text-align: center;
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1.5rem;
-    }
-
-    /* Self-Drawing SVG Checkmark circle */
-    .svg-container {
-      width: 80px;
-      height: 80px;
-    }
-
-    .checkmark-circle {
-      stroke-dasharray: 166;
-      stroke-dashoffset: 166;
-      stroke-width: 2;
-      stroke-miterlimit: 10;
-      stroke: var(--green);
-      fill: none;
-      animation: strokeCircle 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
-    }
-
-    .checkmark-check {
-      transform-origin: 50% 50%;
-      stroke-dasharray: 48;
-      stroke-dashoffset: 48;
-      stroke: var(--green);
-      stroke-width: 3;
-      fill: none;
-      animation: strokeCheck 0.35s cubic-bezier(0.65, 0, 0.45, 1) 0.55s forwards;
-    }
-
-    @keyframes strokeCircle {
-      100% { stroke-dashoffset: 0; }
-    }
-
-    @keyframes strokeCheck {
-      100% { stroke-dashoffset: 0; }
-    }
-
-    h1 {
-      font-family: 'Sora', sans-serif;
-      font-size: 2.1rem;
-      font-weight: 800;
-      color: #FFFFFF;
-      margin-top: 0.5rem;
-    }
-
-    .subtitle {
-      font-size: 0.98rem;
-      color: var(--muted);
-      max-width: 440px;
-    }
-
-    /* Progress bar and counter metrics styles */
-    .progress-wrapper {
-      width: 100%;
-      background: var(--surface2);
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      padding: 1.5rem;
-      border-radius: var(--radius);
-      margin: 1rem 0;
-    }
-
-    .progress-stats {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.82rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 0.75rem;
-    }
-
-    .status-text {
-      color: var(--gold);
-      min-height: 20px; /* Prevent text shifting heights */
-    }
-
-    .pct-counter {
-      color: #FFFFFF;
-    }
-
-    .progress-bar-bg {
-      width: 100%;
-      height: 8px;
-      background: #040914;
-      border-radius: 99px;
-      overflow: hidden;
-    }
-
-    .progress-bar-fill {
-      width: 0%;
-      height: 100%;
-      background: linear-gradient(90deg, var(--gold) 0%, #FFD15C 100%);
-      border-radius: 99px;
-    }
-
-    .countdown-timer {
-      font-size: 0.85rem;
-      color: var(--muted);
-      font-weight: 500;
-    }
-
-    .countdown-timer span {
-      color: var(--gold);
-      font-weight: 700;
-    }
-
-    /* Simulation Assist tool box for instant manual testing in iframe sandbox */
-    .sandbox-guide {
-      background: rgba(245, 166, 35, 0.03);
-      border: 1px dashed rgba(245, 166, 35, 0.15);
-      border-radius: var(--radius);
-      padding: 1.25rem;
-      width: 100%;
-      text-align: left;
-      font-size: 0.8rem;
-      color: var(--muted);
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      margin-top: 1rem;
-    }
-
-    .sandbox-badge {
-      background: var(--gold);
-      color: var(--bg);
-      font-weight: 800;
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      padding: 0.15rem 0.4rem;
-      border-radius: 4px;
-      width: fit-content;
-    }
-
-    .manual-btn {
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--white);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: var(--radius);
-      padding: 0.6rem 1rem;
-      font-size: 0.78rem;
-      font-weight: 600;
-      cursor: pointer;
-      width: 100%;
-      text-align: center;
-      transition: all 0.2s;
-      text-decoration: none;
-    }
-
-    .manual-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: var(--gold);
-      color: var(--gold);
-    }
-  </style>
+  })();
+</script>
+<meta name="robots" content="noindex,nofollow">
+<title>Almost there — HonestPerks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--bg2:#F5F5F7;--ink:#1D1D1F;--ink2:#6E6E73;--gold:#F5A623;--orange:#FF6B35;--green:#34C759;--b:rgba(0,0,0,.1);--f:'Inter',-apple-system,sans-serif}
+@media(prefers-color-scheme:dark){:root{--bg:#000;--bg2:#1C1C1E;--ink:#F5F5F7;--ink2:#A1A1A6;--b:rgba(255,255,255,.12)}}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--f);background:var(--bg);color:var(--ink);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;-webkit-font-smoothing:antialiased}
+.card{background:var(--bg2);border:.5px solid var(--b);border-radius:24px;padding:44px 36px;max-width:440px;width:100%;text-align:center;display:flex;flex-direction:column;align-items:center;gap:18px}
+.logo{display:flex;align-items:center;gap:7px;margin-bottom:4px}
+.logo svg{width:22px;height:22px}
+.logo span{font-size:15px;font-weight:700}
+.logo em{font-style:normal;background:linear-gradient(135deg,var(--gold),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.chk{width:68px;height:68px}
+.chk circle{fill:none;stroke:rgba(52,199,89,.2);stroke-width:3}
+.chk .ring{fill:none;stroke:var(--green);stroke-width:2.5;stroke-dasharray:226;stroke-dashoffset:226;animation:ring .8s ease forwards}
+.chk .tick{fill:none;stroke:var(--green);stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:60;stroke-dashoffset:60;animation:tick .5s ease forwards .6s}
+@keyframes ring{to{stroke-dashoffset:0}}@keyframes tick{to{stroke-dashoffset:0}}
+h1{font-size:21px;font-weight:700;letter-spacing:-.4px}
+.sub{font-size:14px;color:var(--ink2);line-height:1.6;max-width:340px}
+.bar{width:100%;background:var(--bg);border:.5px solid var(--b);border-radius:100px;height:7px;overflow:hidden;margin-top:4px}
+.fill{height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--orange));border-radius:100px}
+.status{font-size:12.5px;color:var(--ink2);min-height:18px}
+.cd{font-size:13px;color:var(--ink2)}.cd strong{color:var(--gold)}
+@media(max-width:480px){
+  body{padding:12px}
+  .card{padding:32px 20px!important;gap:14px!important}
+}
+</style>
 </head>
 <body>
-
-  <div class="thankyou-card">
-    <!-- Checkmark animation -->
-    <div class="svg-container">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52" style="width:100%; height:100%;">
-        <circle class="checkmark-circle" cx="26" cy="26" r="25" />
-        <path class="checkmark-check" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
-      </svg>
-    </div>
-
-    <h1>Account matching...</h1>
-    <p class="subtitle">
-      We are registering your profile and fetching active, high-yield digital rewards.
-    </p>
-
-    <!-- Progress card panel -->
-    <div class="progress-wrapper">
-      <div class="progress-stats">
-        <span class="status-text" id="status-display">Initializing...</span>
-        <span class="pct-counter" id="pct-display">0%</span>
-      </div>
-      <div class="progress-bar-bg">
-        <div class="progress-bar-fill" id="progress-fill"></div>
-      </div>
-    </div>
-
-    <div class="countdown-timer" id="countdown-display">
-      Calculating allocation route...
-    </div>
-
-    <!-- Dev simulation sandbox box -->
-    <div class="sandbox-guide">
-      <div class="sandbox-badge">Double Opt-In Simulator</div>
-      <p>
-        An confirmation token has been logged in your local SQLite store. Click below to confirm instantly and load the verified rewards lists:
-      </p>
-      <a href="#" class="manual-btn" id="simulate-doi-btn">✓ Simulate Double Opt-In Email Click</a>
-    </div>
+<div class="card">
+  <div class="logo">
+    <svg viewBox="0 0 22 22" fill="none"><rect x="1" y="4" width="14" height="14" rx="4" fill="url(#g)"/><rect x="7" y="1" width="14" height="14" rx="4" fill="none" stroke="currentColor" stroke-width="1.2" stroke-opacity=".3"/><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#F5A623"/><stop offset="1" stop-color="#FF6B35"/></linearGradient></defs></svg>
+    <span>Honest<em>Perks</em></span>
+  </div>
+  <svg class="chk" viewBox="0 0 80 80"><circle cx="40" cy="40" r="36"/><circle class="ring" cx="40" cy="40" r="36"/><polyline class="tick" points="24,41 35,52 56,30"/></svg>
+  <h1>You're almost in!</h1>
+  <p class="sub">We just sent your secure reward confirmation email. You must click that verification link to instantly access your physical samples and sweepstakes.</p>
+  
+  <!-- Beautiful, structured instructions to whitelist/check email -->
+  <div style="background: rgba(245,166,35,0.06); border: 0.5px solid rgba(245,166,35,0.25); border-radius: 14px; padding: 18px; margin: 10px 0; text-align: left; width: 100%;">
+    <h3 style="font-size: 13.5px; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+      🚨 Critical: Next Steps to Secure Access
+    </h3>
+    <ul style="font-size: 12.5px; color: var(--ink); list-style-type: none; display: flex; flex-direction: column; gap: 8px;">
+      <li style="display: flex; gap: 8px; align-items: flex-start; line-height: 1.5;">
+        <span style="font-size: 14px;">📧</span>
+        <div><strong>1. Check Spam / Promotions:</strong> Sometimes the first automated voucher email gets filtered mistakenly. Check there if you don't see it in 60 seconds.</div>
+      </li>
+      <li style="display: flex; gap: 8px; align-items: flex-start; line-height: 1.5;">
+        <span style="font-size: 14px;">✉️</span>
+        <div><strong>2. Safelist Our Address:</strong> Add <code>rewards@honestperks.com</code> to your safe-sender or VIP list so you never miss curated product checks!</div>
+      </li>
+      <li style="display: flex; gap: 8px; align-items: flex-start; line-height: 1.5;">
+        <span style="font-size: 14px;">👇</span>
+        <div><strong>3. Gmail Users:</strong> Drag our email from your "Promotions" tab straight into your "Primary" inbox to keep rewards instant!</div>
+      </li>
+    </ul>
   </div>
 
-  <script>
-    // Grab routing values and query parameters
-    const urlParams = new URLSearchParams(window.location.search);
-    const email = urlParams.get('email') || '';
-    
-    // Track and forward tracking context
-    const utms = {
-      utm_source: urlParams.get('utm_source') || 'organic',
-      utm_campaign: urlParams.get('utm_campaign') || 'direct',
-      utm_medium: urlParams.get('utm_medium') || '',
-      utm_content: urlParams.get('utm_content') || '',
-      utm_term: urlParams.get('utm_term') || ''
-    };
-
-    const queryStr = `email=${encodeURIComponent(email)}&utm_source=${encodeURIComponent(utms.utm_source)}&utm_campaign=${encodeURIComponent(utms.utm_campaign)}&utm_medium=${encodeURIComponent(utms.utm_medium)}`;
-    
-    // Plug link into developer simulator
-    const simDoiBtn = document.getElementById('simulate-doi-btn');
-    simDoiBtn.href = `/api/confirm?email=${encodeURIComponent(email)}&${queryStr}`;
-
-    // Elements
-    const progressFill = document.getElementById('progress-fill');
-    const pctDisplay = document.getElementById('pct-display');
-    const statusDisplay = document.getElementById('status-display');
-    const countdownDisplay = document.getElementById('countdown-display');
-
-    // Typewriter status mappings based on percentages
-    const statusTimeline = [
-      { pct: 0, text: "Verifying email registration..." },
-      { pct: 35, text: "Matching you with active rewards..." },
-      { pct: 65, text: "Preparing your member profile..." },
-      { pct: 90, text: "Unlocking your welcome reward..." }
-    ];
-
-    // Smooth filling progress bar over 2.5 seconds
-    const BAR_DURATION = 2500; // ms
-    const INTERVAL_SPEED = 25; // ms
-    let elapsed = 0;
-    
-    const progressInterval = setInterval(() => {
-      elapsed += INTERVAL_SPEED;
-      let percentage = (elapsed / BAR_DURATION) * 100;
-      if (percentage >= 100) {
-        percentage = 100;
-        clearInterval(progressInterval);
-        startCountdown(); // Core countdown begins once bar is saturated
-      }
-
-      progressFill.style.width = percentage + "%";
-      pctDisplay.textContent = Math.round(percentage) + "%";
-
-      // Find appropriate status display
-      const currentStatusObj = statusTimeline.reduce((prev, curr) => {
-        return (percentage >= curr.pct) ? curr : prev;
-      }, statusTimeline[0]);
-      statusDisplay.textContent = currentStatusObj.text;
-
-    }, INTERVAL_SPEED);
-
-    // After progress bar finishes, run down a 5 seconds redirect countdown
-    function startCountdown() {
-      let countdownLeft = 5;
-      countdownDisplay.innerHTML = `Redirecting to rewards dashboard in <span>${countdownLeft}</span> seconds...`;
-
-      const countdownInterval = setInterval(() => {
-        countdownLeft--;
-        if (countdownLeft <= 0) {
-          clearInterval(countdownInterval);
-          // Auto route to bridge with verified confirm state
-          window.location.href = `/bridge?confirmed=1&${queryStr}`;
-        } else {
-          countdownDisplay.innerHTML = `Redirecting to rewards dashboard in <span>${countdownLeft}</span> seconds...`;
-        }
-      }, 1000);
-    }
-  </script>
+  <div class="bar"><div class="fill" id="fill"></div></div>
+  <div class="status" id="status">Saving your details…</div>
+  <div class="cd" id="cd">Taking you to your preview rewards in <strong id="n">4</strong>s…</div>
+</div>
+<script>
+const P=new URLSearchParams(location.search);
+const qs=`confirmed=1&email=${encodeURIComponent(P.get('email')||'')}&utm_source=${P.get('utm_source')||''}&utm_campaign=${P.get('utm_campaign')||''}`;
+const steps=[[0,'Saving your details…'],[35,'Finding your best rewards…'],[70,'Preparing your access…'],[92,'Almost ready…']];
+let t=0;const dur=2400,tick=24;
+const iv=setInterval(()=>{t+=tick;const p=Math.min(t/dur*100,100);document.getElementById('fill').style.width=p+'%';const s=[...steps].reverse().find(x=>p>=x[0]);if(s)document.getElementById('status').textContent=s[1];if(p>=100){clearInterval(iv);cd();}},tick);
+function cd(){let n=4;const el=document.getElementById('n');const i=setInterval(()=>{n--;el.textContent=n;if(n<=0){clearInterval(i);location.href='/bridge?'+qs;}},1000);}
+</script>
 </body>
 </html>

@@ -1,6 +1,6 @@
 {
-  "name": "VerifySecure",
-  "description": "SampleNation email marketing funnel featuring secure DOI flow, high performance offer bridge, and admin manager.",
+  "name": "HonestPerks Rewards",
+  "description": "High performance affiliate offer bridge page, double opt-in sequence funnel, and admin dashboard for HonestPerks.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

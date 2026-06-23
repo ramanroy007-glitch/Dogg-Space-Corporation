@@ -1,768 +1,443 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Prevent read-only Window fetch errors from automated environments -->
-  <script>
-    (function() {
-      try {
-        let currentFetch = window.fetch;
-        Object.defineProperty(window, 'fetch', {
-          get() { return currentFetch; },
-          set(value) { currentFetch = value; },
-          configurable: true,
-          enumerable: true
-        });
-      } catch (e) {
-        console.warn("Fetch shim bypass:", e);
-      }
-    })();
-  </script>
-  <!-- Strictly excluded from crawlers to protect advertiser links -->
-  <meta name="robots" content="noindex, nofollow">
-  <title>Your Curated Rewards Catalog | DoggSpace</title>
-
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;750&family=Sora:wght@700;800&family=JetBrains+Mono:wght@500;750&display=swap" rel="stylesheet">
-
-  <style>
-    /* MASTER DESIGN VARIABLES */
-    :root {
-      --bg: #040914;
-      --surface: #0B1220;
-      --surface2: #111C30;
-      --gold: #F5A623;
-      --gold-dark: #C47F10;
-      --white: #F0F6FF;
-      --muted: rgba(240, 246, 255, 0.52);
-      --subtle: rgba(255, 255, 255, 0.06);
-      --green: #10B981;
-      --purple: #8B5CF6;
-      --radius: 12px;
-      --radius-lg: 20px;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<!-- Prevent read-only Window fetch errors from automated environments -->
+<script>
+  (function() {
+    try {
+      let currentFetch = window.fetch;
+      Object.defineProperty(window, 'fetch', {
+        get() { return currentFetch; },
+        set(value) { currentFetch = value; },
+        configurable: true,
+        enumerable: true
+      });
+    } catch (e) {
+      console.warn("Fetch shim bypass:", e);
     }
+  })();
+</script>
+<meta name="robots" content="noindex,nofollow">
+<title>Your Rewards — HonestPerks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fff;--bg2:#F5F5F7;--bg3:#EDEDF0;--ink:#1D1D1F;--ink2:#6E6E73;--ink3:#A1A1A6;
+  --gold:#F5A623;--orange:#FF6B35;--grad:linear-gradient(135deg,#F5A623,#FF6B35);--green:#34C759;
+  --b:rgba(0,0,0,.1);--b2:rgba(0,0,0,.06);--f:'Inter',-apple-system,sans-serif;--r:12px;--rl:18px;
+}
+@media(prefers-color-scheme:dark){:root{--bg:#000;--bg2:#1C1C1E;--bg3:#2C2C2E;--ink:#F5F5F7;--ink2:#A1A1A6;--ink3:#6E6E73;--b:rgba(255,255,255,.12);--b2:rgba(255,255,255,.07)}}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--f);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%}a{color:inherit;text-decoration:none}
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+/* CONFETTI banner */
+.celebrate{position:fixed;inset:0;z-index:999;background:var(--green);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;opacity:0;pointer-events:none;transition:opacity .4s}
+.celebrate.show{opacity:1;pointer-events:all}
+.celebrate.out{opacity:0;transform:translateY(-100%);transition:opacity .4s,transform .6s cubic-bezier(.4,0,.2,1)}
+.celebrate svg{width:76px;height:76px}
+.celebrate .ring{fill:none;stroke:rgba(255,255,255,.25);stroke-width:3}
+.celebrate .rg{fill:none;stroke:#fff;stroke-width:2.5;stroke-dasharray:226;stroke-dashoffset:226;animation:rg .9s ease forwards}
+.celebrate .tk{fill:none;stroke:#fff;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:60;stroke-dashoffset:60;animation:tk .6s ease forwards .5s}
+@keyframes rg{to{stroke-dashoffset:0}}@keyframes tk{to{stroke-dashoffset:0}}
+.celebrate h2{color:#fff;font-size:22px;font-weight:700;text-align:center;padding:0 20px}
+.celebrate p{color:rgba(255,255,255,.8);font-size:14px}
 
-    body {
-      background-color: var(--bg);
-      color: var(--white);
-      font-family: 'Inter', sans-serif;
-      overflow-x: hidden;
-      min-height: 100vh;
-      line-height: 1.6;
-    }
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;background:rgba(255,255,255,.85);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:.5px solid var(--b2)}
+@media(prefers-color-scheme:dark){.nav{background:rgba(0,0,0,.85)}}
+.logo{display:flex;align-items:center;gap:8px}
+.logo svg{width:22px;height:22px}
+.logo span{font-size:16px;font-weight:600;letter-spacing:-.4px}
+.logo em{font-style:normal;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.nav-r{font-size:12px;color:var(--ink3);display:flex;align-items:center;gap:6px}
+.nav-dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
 
-    /* Sticky Nav */
-    nav {
-      position: sticky;
-      top: 0;
-      width: 100%;
-      height: 70px;
-      background: rgba(4, 9, 20, 0.85);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--subtle);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0 2rem;
-      z-index: 100;
-    }
+/* PAGE */
+.page{max-width:1080px;margin:0 auto;padding:32px 22px 72px}
+.bar{display:flex;align-items:center;gap:12px;background:rgba(52,199,89,.08);border:.5px solid rgba(52,199,89,.25);border-radius:var(--r);padding:13px 16px;margin-bottom:32px;font-size:13px;color:#15803D}
+@media(prefers-color-scheme:dark){.bar{color:#86efac}}
+.bar-c{width:22px;height:22px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.hdr{text-align:center;margin-bottom:40px}
+.eyebrow{display:inline-block;font-size:11.5px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+h1{font-size:clamp(26px,4vw,40px);font-weight:700;letter-spacing:-1.2px;line-height:1.12;margin-bottom:10px}
+h1 em{font-style:normal;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hsub{font-size:15px;color:var(--ink2);max-width:500px;margin:0 auto;line-height:1.6}
 
-    .logo {
-      font-family: 'Sora', sans-serif;
-      font-weight: 800;
-      font-size: 1.4rem;
-      color: var(--white);
-      text-decoration: none;
-    }
+/* TIER LABEL */
+.tier{display:flex;align-items:center;gap:10px;margin:36px 0 18px;padding-bottom:12px;border-bottom:.5px solid var(--b2)}
+.tier-t{font-size:16px;font-weight:700;letter-spacing:-.3px}
+.tier-p{font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;text-transform:uppercase;letter-spacing:.05em}
+.tp-green{background:rgba(52,199,89,.12);color:#15803D}
+.tp-gold{background:rgba(245,166,35,.12);color:#92400E}
+@media(prefers-color-scheme:dark){.tp-green{color:#86efac}.tp-gold{color:#FCD34D}}
 
-    .logo span {
-      color: var(--gold);
-    }
+/* GRID + CARDS */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,288px),1fr));gap:16px}
+.oc{cursor:pointer;background:var(--bg);border:.5px solid var(--b2);border-radius:var(--rl);overflow:hidden;display:flex;flex-direction:column;opacity:0;transform:translateY(20px);animation:rise .5s ease forwards;transition:border-color .2s,box-shadow .2s,transform .2s}
+.oc:hover{border-color:var(--b);box-shadow:0 12px 36px rgba(0,0,0,.1);transform:translateY(-4px)}
+.oc.t1{border-top:2px solid var(--green)}.oc.t2{border-top:2px solid var(--gold)}
+@keyframes rise{to{opacity:1;transform:translateY(0)}}
+.oc-img{position:relative;height:170px;overflow:hidden;background:var(--bg3)}
+.oc-img img{width:100%;height:100%;object-fit:cover;transition:transform .4s, filter .45s ease, opacity .45s ease;filter:blur(0);opacity:1}
+.oc-img img.lazy{filter:blur(12px);opacity:0.35}
+.oc-img img.lazy.loaded{filter:blur(0);opacity:1}
+.oc:hover .oc-img img:not(.lazy){transform:scale(1.05)}
+.oc:hover .oc-img img.loaded{transform:scale(1.05)}
+.oc-badge{position:absolute;top:10px;right:10px;background:var(--grad);color:#1a0a00;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 10px;border-radius:100px}
+.oc-ic{position:absolute;top:10px;left:10px;width:34px;height:34px;border-radius:9px;background:rgba(0,0,0,.55);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;font-size:17px;border:.5px solid rgba(255,255,255,.15)}
+.oc-pay{position:absolute;bottom:10px;left:12px;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.6)}
+.oc-pay .v{font-size:20px;font-weight:700;display:block;line-height:1}
+.oc-pay .l{font-size:10px;opacity:.85}
+.oc-b{padding:16px;flex:1;display:flex;flex-direction:column;gap:10px}
+.oc-meta{display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.02);border:0.5px solid var(--b2);border-radius:6px;padding:6px 10px;margin-bottom:2px}
+.oc-net-badge{display:inline-flex;align-items:center;gap:4px;font-size:9.5px;font-weight:700;color:var(--gold);background:rgba(245,166,35,0.08);border:0.5px solid rgba(245,166,35,0.2);padding:2.5px 7px;border-radius:4px;text-transform:uppercase;letter-spacing:0.04em}
+.oc-reward-val{font-size:10.5px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:0.02em;display:flex;align-items:center;gap:3px}
+.oc-name{font-size:15px;font-weight:600;letter-spacing:-.3px;line-height:1.3}
+.oc-desc{font-size:13px;color:var(--ink2);line-height:1.6;flex:1}
+.oc-truth{border-radius:0 var(--r) var(--r) 0;padding:10px 12px;font-size:12px;line-height:1.55}
+.oc-truth.t1{background:rgba(52,199,89,.06);border-left:2px solid var(--green);color:var(--ink2)}
+.oc-truth.t2{background:rgba(245,166,35,.06);border-left:2px solid var(--gold);color:var(--ink2)}
+.oc-truth strong{color:var(--ink);display:block;font-size:12.5px;margin-bottom:2px}
+.oc-pills{display:flex;gap:7px;flex-wrap:wrap}
+.oc-pill{background:var(--bg2);border-radius:100px;padding:3px 10px;font-size:11px;color:var(--ink2);font-weight:500}
+.oc-pill b{color:var(--gold)}
+.oc-cta{display:block;width:100%;padding:12px;border:none;border-radius:100px;font-size:14px;font-weight:600;font-family:var(--f);cursor:pointer;text-align:center;background:var(--grad);color:#1a0a00;transition:opacity .15s;position:relative;overflow:hidden}
+.oc-cta::after{content:'';position:absolute;top:0;left:-70%;width:40%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);animation:shim 2.6s infinite}
+@keyframes shim{0%{left:-70%}100%{left:140%}}
+.oc-cta:hover{opacity:.9}
+.oc-cta.dis{background:var(--bg3);color:var(--ink3);cursor:default}
+.oc-cta.dis::after{display:none}
+.oc-micro{font-size:10.5px;color:var(--ink3);text-align:center;line-height:1.5}
+.skel{background:var(--bg);border:.5px solid var(--b2);border-radius:var(--rl);overflow:hidden;display:flex;flex-direction:column;position:relative}
+.skel-img{height:166px;background:var(--bg2);position:relative;overflow:hidden}
+.skel-b{padding:16px;flex:1;display:flex;flex-direction:column;gap:12px}
+.skel-meta{display:flex;justify-content:space-between;align-items:center}
+.skel-line{background:var(--bg2);border-radius:4px;position:relative;overflow:hidden}
+.skel-net{width:45%;height:12px}
+.skel-type{width:25%;height:12px}
+.skel-name{width:80%;height:18px}
+.skel-desc-1{width:100%;height:13px}
+.skel-desc-2{width:90%;height:13px}
+.skel-desc-3{width:60%;height:13px}
+.skel-truth{height:60px;background:var(--bg2);border-radius:var(--r);position:relative;overflow:hidden;border-left:2px solid var(--b2)}
+.skel-pills{display:flex;gap:7px}
+.skel-pill{width:60px;height:20px;border-radius:100px;background:var(--bg2);position:relative;overflow:hidden}
+.skel-cta{height:38px;border-radius:100px;background:var(--bg2);position:relative;overflow:hidden;margin-top:4px}
+.skel-micro{width:50%;height:10px;margin:0 auto;background:var(--bg2);position:relative;overflow:hidden}
+.skel-img::after,.skel-line::after,.skel-truth::after,.skel-pill::after,.skel-cta::after,.skel-micro::after{content:'';position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,rgba(245,166,35,0.08) 25%,rgba(255,107,53,0.15) 50%,rgba(245,166,35,0.08) 75%,transparent);animation:shimmer 1.6s infinite ease-in-out}
+@keyframes shimmer{100%{transform:translateX(100%)}}
 
-    .nav-stats {
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-    }
+/* TRUST */
+.trust{background:var(--bg2);border:.5px solid var(--b2);border-radius:var(--rl);padding:28px;margin-top:44px}
+.trust h3{font-size:16px;font-weight:700;margin-bottom:20px;letter-spacing:-.3px}
+.tgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.ti{display:flex;gap:12px;align-items:flex-start}
+.ti-n{width:28px;height:28px;border-radius:50%;background:rgba(245,166,35,.1);border:.5px solid rgba(245,166,35,.3);color:var(--gold);font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ti h4{font-size:13px;font-weight:600;margin-bottom:3px}
+.ti p{font-size:12px;color:var(--ink2);line-height:1.55}
 
-    .nav-badge {
-      background: var(--surface2);
-      border: 1px solid var(--subtle);
-      font-weight: 700;
-      font-size: 0.74rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      padding: 0.35rem 0.85rem;
-      border-radius: 99px;
-      color: var(--gold);
-    }
-
-    /* Header banner styling */
-    header {
-      max-width: 1200px;
-      margin: 3rem auto 1rem auto;
-      padding: 0 2rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    /* DOI Alert confirmation Banner */
-    .doi-banner {
-      display: none; /* Auto shown dynamically */
-      background: rgba(16, 185, 129, 0.1);
-      border: 1px solid rgba(16, 185, 129, 0.25);
-      border-radius: var(--radius);
-      padding: 1.25rem 2rem;
-      color: var(--green);
-      font-size: 0.92rem;
-      align-items: center;
-      gap: 1rem;
-      animation: fadeIn 0.4s ease-out;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .doi-circle-check {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: var(--green);
-      color: var(--bg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 0.8rem;
-    }
-
-    .header-box {
-      background: var(--surface);
-      border: 1px solid var(--subtle);
-      border-radius: var(--radius-lg);
-      padding: 3rem 2.5rem;
-      display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      align-items: center;
-      gap: 2rem;
-    }
-
-    @media (max-width: 850px) {
-      .header-box {
-        grid-template-columns: 1fr;
-        padding: 2rem 1.5rem;
-      }
-    }
-
-    .header-left h1 {
-      font-family: 'Sora', sans-serif;
-      font-size: 2.1rem;
-      font-weight: 800;
-      color: #FFFFFF;
-      margin-bottom: 0.5rem;
-    }
-
-    .header-left p {
-      color: var(--muted);
-      font-size: 0.98rem;
-      max-width: 600px;
-    }
-
-    /* Quick indicators */
-    .tracker-metrics-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1rem;
-    }
-
-    .metric-bubble {
-      background: var(--surface2);
-      border: 1px solid var(--subtle);
-      padding: 1rem 1.25rem;
-      border-radius: var(--radius);
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-
-    .metric-bubble .label {
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      font-weight: 700;
-      color: var(--muted);
-      letter-spacing: 0.5px;
-    }
-
-    .metric-bubble .val {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 1.4rem;
-      font-weight: 750;
-      color: var(--gold);
-    }
-
-    /* Category Navigation bar Tab selectors */
-    .catalog-section {
-      max-width: 1200px;
-      margin: 2.5rem auto;
-      padding: 0 2rem;
-    }
-
-    .tab-bar {
-      display: flex;
-      gap: 0.75rem;
-      border-bottom: 1.5px solid var(--subtle);
-      padding-bottom: 0.8rem;
-      margin-bottom: 2rem;
-      overflow-x: auto;
-      white-space: nowrap;
-    }
-
-    .tab-btn {
-      background: none;
-      border: none;
-      font-family: 'Sora', sans-serif;
-      font-size: 0.92rem;
-      font-weight: 700;
-      color: var(--muted);
-      padding: 0.6rem 1.25rem;
-      cursor: pointer;
-      border-radius: 99px;
-      transition: all 0.25s;
-    }
-
-    .tab-btn:hover {
-      color: #FFFFFF;
-      background: rgba(255, 255, 255, 0.04);
-    }
-
-    .tab-btn.active {
-      background: var(--gold);
-      color: var(--bg);
-    }
-
-    /* Offers comparison Card Grid */
-    .offers-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 2rem;
-    }
-
-    @media (max-width: 968px) {
-      .offers-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    @media (max-width: 600px) {
-      .offers-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    /* Offer card styles */
-    .offer-card {
-      background: var(--surface);
-      border: 1px solid var(--subtle);
-      border-radius: var(--radius);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      position: relative;
-      transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
-    }
-
-    .offer-card:hover {
-      transform: translateY(-5px);
-      border-color: rgba(245, 166, 35, 0.3);
-      box-shadow: 0 10px 25px rgba(245, 166, 35, 0.08);
-    }
-
-    .offer-image-box {
-      width: 100%;
-      height: 155px;
-      overflow: hidden;
-      background: var(--surface2);
-      position: relative;
-    }
-
-    .offer-image {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.4s;
-    }
-
-    .offer-card:hover .offer-image {
-      transform: scale(1.05);
-    }
-
-    .offer-badge {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: #02050c;
-      border: 1px solid rgba(245, 166, 35, 0.4);
-      color: var(--gold);
-      font-size: 0.72rem;
-      font-weight: 700;
-      padding: 0.3rem 0.7rem;
-      border-radius: 4px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .offer-content {
-      padding: 1.5rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      flex-grow: 1;
-    }
-
-    .offer-meta {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.76rem;
-      color: var(--muted);
-      font-weight: 600;
-    }
-
-    .network-badge {
-      font-family: 'JetBrains Mono', monospace;
-      color: var(--green);
-    }
-
-    .offer-title {
-      font-family: 'Sora', sans-serif;
-      font-size: 1.15rem;
-      line-height: 1.35;
-      color: #FFFFFF;
-      font-weight: 800;
-    }
-
-    .offer-desc {
-      font-size: 0.88rem;
-      color: var(--muted);
-      line-height: 1.5;
-      flex-grow: 1; /* Pushes button downwards */
-    }
-
-    /* Payout banner row inside card */
-    .payout-strip {
-      background: var(--surface2);
-      border-radius: 6px;
-      padding: 0.65rem 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.8rem;
-    }
-
-    .payout-strip .label {
-      color: var(--muted);
-      font-weight: 600;
-    }
-
-    .payout-strip .amount {
-      font-family: 'JetBrains Mono', monospace;
-      color: var(--gold);
-      font-weight: 750;
-      font-size: 0.95rem;
-    }
-
-    /* Claim button inside card */
-    .claim-btn {
-      background: var(--white);
-      color: var(--bg);
-      font-family: 'Sora', sans-serif;
-      font-weight: 700;
-      font-size: 0.88rem;
-      border: none;
-      padding: 0.85rem;
-      border-radius: var(--radius);
-      cursor: pointer;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 0.4rem;
-      transition: all 0.2s;
-      text-decoration: none;
-      text-align: center;
-    }
-
-    .claim-btn:hover {
-      background: var(--gold);
-      color: var(--bg);
-    }
-
-    /* Loading placeholder and skeleton */
-    .loader-box {
-      text-align: center;
-      padding: 4rem 2rem;
-      background: var(--surface);
-      border: 1px solid var(--subtle);
-      border-radius: var(--radius-lg);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .spinner {
-      width: 44px;
-      height: 44px;
-      border: 3.5px solid var(--surface2);
-      border-top-color: var(--gold);
-      border-radius: 50%;
-      animation: spin 1s infinite linear;
-    }
-
-    @keyframes spin {
-      100% { transform: rotate(360deg); }
-    }
-
-    /* TRUST Section explaining terms, policies, compliance */
-    .trust-section {
-      max-width: 1200px;
-      margin: 4rem auto;
-      padding: 0 2rem;
-    }
-
-    .trust-box {
-      background: var(--surface);
-      border: 1px solid var(--subtle);
-      border-radius: var(--radius-lg);
-      padding: 3rem;
-    }
-
-    @media (max-width: 600px) {
-      .trust-box {
-        padding: 1.5rem;
-      }
-    }
-
-    .trust-title {
-      font-family: 'Sora', sans-serif;
-      font-size: 1.6rem;
-      font-weight: 800;
-      color: #FFFFFF;
-      margin-bottom: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .trust-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 2.5rem;
-    }
-
-    @media (max-width: 850px) {
-      .trust-grid {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-      }
-    }
-
-    .trust-col {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .trust-item-title {
-      font-weight: 700;
-      font-size: 1rem;
-      color: var(--white);
-    }
-
-    .trust-item-desc {
-      font-size: 0.88rem;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-
-    /* Footer */
-    footer {
-      background: #02050c;
-      border-top: 1px solid var(--subtle);
-      padding: 3rem 2rem;
-      text-align: center;
-      font-size: 0.76rem;
-      color: var(--muted);
-    }
-  </style>
-
-  <!-- canvas-confetti library for claim celebrations -->
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+/* FOOTER */
+footer{border-top:.5px solid var(--b2);margin-top:44px;padding-top:28px}
+.fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:22px;margin-bottom:20px}
+.fc h4{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--ink2);margin-bottom:9px}
+.fc p,.fc a{font-size:11px;color:var(--ink3);line-height:1.7;display:block;margin-bottom:3px}
+.fcopy{text-align:center;font-size:11px;color:var(--ink3);padding-top:18px;border-top:.5px solid var(--b2)}
+@media(max-width:480px){
+  .page{padding:20px 12px 48px}
+  .bar{padding:10px 12px!important;font-size:12px!important;margin-bottom:24px!important;gap:8px!important}
+  .bar-c{width:18px!important;height:18px!important;font-size:10px!important}
+  .hdr{margin-bottom:24px!important}
+  .hdr h1{font-size:22px!important;letter-spacing:-0.8px!important}
+  .hdr .hsub{font-size:13.5px!important;line-height:1.5!important}
+  .tier{margin:24px 0 14px!important;padding-bottom:8px!important}
+  .tier-t{font-size:14.5px!important}
+  .tier-p{font-size:10px!important;padding:2px 8px!important}
+  .grid{gap:12px!important}
+  .oc{border-radius:var(--rl)}
+  .oc-img{height:140px!important}
+  .oc-pay .v{font-size:18px!important}
+  .oc-pay .l{font-size:9px!important}
+  .oc-b{padding:12px!important;gap:8px!important}
+  .oc-name{font-size:14px!important}
+  .oc-desc{font-size:12px!important;line-height:1.5!important}
+  .oc-truth{padding:8px 10px!important;font-size:11px!important}
+  .oc-truth strong{font-size:11.5px!important}
+  .oc-pill{font-size:10px!important;padding:2px 8px!important}
+  .oc-cta{padding:10px!important;font-size:13px!important}
+  .trust{padding:16px!important;margin-top:28px!important}
+  .trust h3{font-size:14px!important;margin-bottom:14px!important}
+  .tgrid{grid-template-columns:1fr!important;gap:14px!important}
+  footer{margin-top:28px!important;padding-top:20px!important}
+  .fg{grid-template-columns:1fr!important;gap:16px!important}
+}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
 </head>
 <body>
 
-  <!-- Sticky Nav -->
-  <nav>
-    <a href="/" class="logo">
-      <span>Dogg</span>Space
-    </a>
-    <div class="nav-stats">
-      <div class="nav-badge">📦 US/Canada Catalog 2026</div>
-    </div>
-  </nav>
+<div class="celebrate" id="celebrate">
+  <svg viewBox="0 0 80 80"><circle class="ring" cx="40" cy="40" r="36"/><circle class="rg" cx="40" cy="40" r="36"/><polyline class="tk" points="24,41 35,52 56,30"/></svg>
+  <h2>You're confirmed!</h2>
+  <p>Unlocking your rewards…</p>
+</div>
 
-  <!-- Header Section -->
-  <header>
-    <!-- DOI confirmed notification banner -->
-    <div class="doi-banner" id="doi-banner-alert">
-      <div class="doi-circle-check">&check;</div>
-      <div>
-        <strong>Double Opt-In Confirmed!</strong> Your mailbox ownership is successfully verified and eligibility status set to active. Handpicked reward campaigns unlocked below.
-      </div>
-    </div>
+<nav class="nav">
+  <div class="logo">
+    <svg viewBox="0 0 22 22" fill="none"><rect x="1" y="4" width="14" height="14" rx="4" fill="url(#g)"/><rect x="7" y="1" width="14" height="14" rx="4" fill="none" stroke="currentColor" stroke-width="1.2" stroke-opacity=".3"/><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#F5A623"/><stop offset="1" stop-color="#FF6B35"/></linearGradient></defs></svg>
+    <span>Honest<em>Perks</em></span>
+  </div>
+  <div class="nav-r"><span class="nav-dot"></span>47,284 members</div>
+</nav>
 
-    <!-- Main visual greeting card -->
-    <div class="header-box">
-      <div class="header-left">
-        <h1>Your handpicked reward matches</h1>
-        <p>
-          We query available advertising networks in real-time. Review the comparison configurations below and select specific offers to claim yours. Zero credit catches.
-        </p>
-      </div>
+<div class="page">
+  <div class="bar" id="bar" style="display:none"><div class="bar-c">✓</div><div><strong>Email confirmed!</strong> Welcome to HonestPerks. Your rewards are ready below.</div></div>
 
-      <div class="tracker-metrics-grid">
-        <div class="metric-bubble">
-          <span class="label">Open catalog items</span>
-          <span class="val" id="catalog-count-bubble">10 Real</span>
-        </div>
-        <div class="metric-bubble">
-          <span class="label">Total payout value</span>
-          <span class="val">$24.15</span>
-        </div>
-      </div>
-    </div>
-  </header>
+  <div class="hdr">
+    <div class="eyebrow">🎁 Your Rewards Dashboard</div>
+    <h1>Your rewards are <em>ready to claim</em></h1>
+    <p class="hsub">Every offer below is verified by our team. We're always honest about exactly what each one is.</p>
+  </div>
 
-  <!-- Catalog section tabs and offer blocks -->
-  <main class="catalog-section">
-    <!-- Category Tabs -->
-    <div class="tab-bar">
-      <button class="tab-btn active" id="tab0" onclick="filterCatalog(0)">⭐ All Rewards</button>
-      <button class="tab-btn" id="tab1" onclick="filterCatalog(1)">📦 Hand-Curated Samples</button>
-      <button class="tab-btn" id="tab2" onclick="filterCatalog(2)">💸 Free Entries & Sweepstakes</button>
-    </div>
-
-    <!-- Loading screen placeholder -->
-    <div class="loader-box" id="catalog-loader">
-      <div class="spinner"></div>
-      <p style="font-size: 0.9rem; color: var(--muted)">Matching campaign codes. Connecting secure trackers...</p>
-    </div>
-
-    <!-- Offer card grid -->
-    <div class="offers-grid" id="catalog-offers" style="display: none;">
-      <!-- Catalog items dynamically populated -->
-    </div>
-  </main>
-
-  <!-- Transparency trust card section -->
-  <section class="trust-section">
-    <div class="trust-box">
-      <div class="trust-title">
-        🛡️ Transparency & Safety Console
-      </div>
-
-      <div class="trust-grid">
-        <!-- Col 1 -->
-        <div class="trust-col">
-          <div class="trust-item-title">We process referral commissions</div>
-          <div class="trust-item-desc">
-            DoggSpace operates on a zero-subscription structure. When you take action and participate in specific third-party campaigns linked in our directory (such as registering for Maybelline tests or Tide draws), we receive commission compensation from sponsoring advertisers. These commissions finance our strict background checks, ensuring registrations remain catalog-free.
+  <div id="root">
+    <div class="grid">
+      <!-- Skeleton 1 -->
+      <div class="skel">
+        <div class="skel-img"></div>
+        <div class="skel-b">
+          <div class="skel-meta">
+            <div class="skel-line skel-net"></div>
+            <div class="skel-line skel-type"></div>
           </div>
-        </div>
-
-        <!-- Col 2 -->
-        <div class="trust-col">
-          <div class="trust-item-title">Qualification Disclaimers</div>
-          <div class="trust-item-desc">
-            All details surrounding cosmetic test bundles, home snacks, and sweepstakes values are provided entirely for comparison and information contexts. Because DoggSpace does not manufacture or physically ship individual sample packages ourselves, final qualifications and prize dispersals are completely regulated by external advertisers. Allocations are restricted by local sponsor stocks.
+          <div class="skel-line skel-name"></div>
+          <div class="skel-line skel-desc-1"></div>
+          <div class="skel-line skel-desc-2"></div>
+          <div class="skel-line skel-desc-3"></div>
+          <div class="skel-truth"></div>
+          <div class="skel-pills">
+            <div class="skel-pill"></div>
+            <div class="skel-pill"></div>
           </div>
+          <div class="skel-cta"></div>
+        </div>
+      </div>
+      <!-- Skeleton 2 -->
+      <div class="skel">
+        <div class="skel-img"></div>
+        <div class="skel-b">
+          <div class="skel-meta">
+            <div class="skel-line skel-net"></div>
+            <div class="skel-line skel-type"></div>
+          </div>
+          <div class="skel-line skel-name"></div>
+          <div class="skel-line skel-desc-1"></div>
+          <div class="skel-line skel-desc-2"></div>
+          <div class="skel-line skel-desc-3"></div>
+          <div class="skel-truth"></div>
+          <div class="skel-pills">
+            <div class="skel-pill"></div>
+            <div class="skel-pill"></div>
+          </div>
+          <div class="skel-cta"></div>
+        </div>
+      </div>
+      <!-- Skeleton 3 -->
+      <div class="skel">
+        <div class="skel-img"></div>
+        <div class="skel-b">
+          <div class="skel-meta">
+            <div class="skel-line skel-net"></div>
+            <div class="skel-line skel-type"></div>
+          </div>
+          <div class="skel-line skel-name"></div>
+          <div class="skel-line skel-desc-1"></div>
+          <div class="skel-line skel-desc-2"></div>
+          <div class="skel-line skel-desc-3"></div>
+          <div class="skel-truth"></div>
+          <div class="skel-pills">
+            <div class="skel-pill"></div>
+            <div class="skel-pill"></div>
+          </div>
+          <div class="skel-cta"></div>
+        </div>
+      </div>
+      <!-- Skeleton 4 -->
+      <div class="skel">
+        <div class="skel-img"></div>
+        <div class="skel-b">
+          <div class="skel-meta">
+            <div class="skel-line skel-net"></div>
+            <div class="skel-line skel-type"></div>
+          </div>
+          <div class="skel-line skel-name"></div>
+          <div class="skel-line skel-desc-1"></div>
+          <div class="skel-line skel-desc-2"></div>
+          <div class="skel-line skel-desc-3"></div>
+          <div class="skel-truth"></div>
+          <div class="skel-pills">
+            <div class="skel-pill"></div>
+            <div class="skel-pill"></div>
+          </div>
+          <div class="skel-cta"></div>
         </div>
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- Footer -->
+  <div class="trust">
+    <h3>🛡️ Why HonestPerks only shares what we'd claim ourselves</h3>
+    <div class="tgrid">
+      <div class="ti"><div class="ti-n">1</div><div><h4>Every offer reviewed</h4><p>We check the advertiser, what you receive, and the fine print before anything appears here.</p></div></div>
+      <div class="ti"><div class="ti-n">2</div><div><h4>Upfront on commissions</h4><p>We earn a referral fee when you complete an offer. We say so on every card. Your reward is free.</p></div></div>
+      <div class="ti"><div class="ti-n">3</div><div><h4>No predatory offers</h4><p>Casino, payday loans, credit traps — we decline them all. Your trust beats a higher payout.</p></div></div>
+      <div class="ti"><div class="ti-n">4</div><div><h4>2–3 emails a week max</h4><p>We protect your inbox. Unsubscribe in one click, anytime. No dark patterns, ever.</p></div></div>
+    </div>
+  </div>
+
   <footer>
-    <p>&copy; 2026 DoggSpace Funnels. All rights reserved.</p>
+    <div class="fg">
+      <div class="fc"><h4>FTC Disclosure</h4><p>HonestPerks is an independent rewards aggregator. We receive tracking referral compensation when users participate in promoted offers. Compensation does not affect our curation.</p></div>
+      <div class="fc"><h4>Platform Disclaimer</h4><p>Independent, with no affiliation with Meta, Facebook Ads, Google, or any ad platform. All sweepstakes are free to enter. Winning is not guaranteed.</p></div>
+      <div class="fc"><h4>Navigation</h4><a href="/privacy">Privacy Policy</a><a href="/terms">Terms of Service</a><a href="mailto:support@honestperks.com">Contact Support</a></div>
+    </div>
+    <div class="fcopy">123 Main Street, Suite 100, Miami, FL 33101 · © 2026 HonestPerks Corporation</div>
   </footer>
+</div>
 
-  <script>
-    // Unsplash keyword to image mappings to keep visualizations realistic
-    const keywordImages = {
-      'free sample box products colorful': 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?q=30&w=400&auto=format&fit=crop',
-      'Maybelline makeup cosmetics set colorful': 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=30&w=400&auto=format&fit=crop',
-      'healthy snack box food samples': 'https://images.unsplash.com/photo-1505576399279-565b52d4ac71?q=30&w=400&auto=format&fit=crop',
-      'pistachio chocolate luxury Dubai bar': 'https://images.unsplash.com/photo-1511381939415-e44015466834?q=30&w=400&auto=format&fit=crop',
-      'product testing panel samples variety': 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=30&w=400&auto=format&fit=crop',
-      'Amazon gift card shopping prize': 'https://images.unsplash.com/photo-1523474253046-8cd2748b5fd2?q=30&w=400&auto=format&fit=crop',
-      'Walmart gift card prize winner': 'https://images.unsplash.com/photo-1580793241553-e9f1cbb1d310?q=30&w=400&auto=format&fit=crop',
-      'Tide laundry detergent household products': 'https://images.unsplash.com/photo-1563453392212-326f5e854473?q=30&w=400&auto=format&fit=crop',
-      'Pampers baby products family': 'https://images.unsplash.com/photo-1515488042361-404e9250afef?q=30&w=400&auto=format&fit=crop',
-      'Bose headphones premium audio': 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=30&w=400&auto=format&fit=crop'
-    };
-
-    let allOffers = [];
-    let activeFilter = 0; // 0 = all, 1 = tier 1, 2 = tier 2
-
-    // Read URL check params
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('confirmed') === '1') {
-      document.getElementById('doi-banner-alert').style.display = 'flex';
-    }
-
-    // Exponential Backoff retry network fetcher
-    async function fetchOffersWithRetry(retries = 3, delay = 500) {
-      try {
-        const response = await fetch('/api/offers');
-        if (!response.ok) {
-          throw new Error(`Failed to query database catalog. Status: ${response.status}`);
-        }
-        return await response.json();
-      } catch (err) {
-        if (retries > 0) {
-          console.warn(`Network retry active. Retries remaining: ${retries}. Delaying ${delay}ms...`);
-          await new Promise(res => setTimeout(res, delay));
-          return fetchOffersWithRetry(retries - 1, delay * 2);
-        }
-        throw err;
+<script>
+const P=new URLSearchParams(location.search);
+function truth(tier,payout){
+  if(tier===1)return{c:'t1',h:'📦 What you actually get:',b:`A brand-new product sample or evaluation kit shipped straight to your doorstep — 100% free with free shipping. No hidden charges or credit card details required, ever.`};
+  return{c:'t2',h:'🎯 What this is:',b:`A certified giveaway or premium voucher entry. Drawing results are conducted independently via verified random allocation. Always 100% free to enter.`};
+}
+function cta(t){return t===1?'Claim Free Sample →':'Enter Sweepstake — Drop-In →'}
+function handleBridgeClaimClick(event, id, link) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  hit(id);
+  if (link) {
+    try {
+      const opened = window.open(link, '_blank');
+      if (!opened || opened.closed || typeof opened.closed === 'undefined') {
+        location.href = link;
       }
+    } catch (err) {
+      location.href = link;
     }
+  }
+  return false;
+}
+function card(o,d){
+  const t=truth(o.tier,o.payout),linked=o.affiliate_link&&o.affiliate_link.length>10,star=(o.epc||0)>=0.26;
+  const clickHandler = linked ? `onclick="return handleBridgeClaimClick(event, ${o.id}, '${o.affiliate_link}')"` : '';
+  const netBadgeName = o.tier === 1 ? '✦ Direct Brand Sample' : '✦ Verified Promo Host';
+  const rewardVal = o.badge ? `🎁 ${o.badge}` : (o.tier === 1 ? '🎁 Free Sample' : '🎁 Free Entry');
+  const placeholderSvg = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 166'><rect width='100%25' height='100%25' fill='%23191919'/></svg>`;
 
-    // Initialize catalog list
-    window.addEventListener('DOMContentLoaded', () => {
-      fetchOffersWithRetry()
-        .then(data => {
-          allOffers = data;
-          document.getElementById('catalog-loader').style.display = 'none';
-          document.getElementById('catalog-offers').style.display = 'grid';
-          document.getElementById('catalog-count-bubble').textContent = `${data.length} Real`;
-          renderOffers();
-        })
-        .catch(err => {
-          console.error("Critical matching failure loading catalog:", err);
-          const loader = document.getElementById('catalog-loader');
-          loader.innerHTML = `
-            <p style="color:#F87171; font-weight:700;">⚠ Failed to connect to offer database.</p>
-            <p style="font-size:0.8rem; color:var(--muted)">Ensure local server execution logs are running without exceptions.</p>
-            <button onclick="window.location.reload()" class="claim-btn" style="margin-top:1rem; width:fit-content; border:1px solid #F5A623; color:#F5A623; background:none;">Retry Connection</button>
-          `;
-        });
+  return `<div class="oc ${o.tier===1?'t1':'t2'}" style="animation-delay:${d}s" ${clickHandler}>
+    <div class="oc-img"><img class="lazy" data-src="${o.image_url}" src="${placeholderSvg}" alt="${o.name}">
+      <div class="oc-ic">${o.icon||'🎁'}</div><div class="oc-badge">${o.badge||'Free'}</div>
+      <div class="oc-pay"><span class="v">FREE</span><span class="l">to you</span></div></div>
+    <div class="oc-b">
+      <div class="oc-meta">
+        <div class="oc-net-badge">${netBadgeName}</div>
+        <div class="oc-reward-val">${rewardVal}</div>
+      </div>
+      <div class="oc-name">${o.name}</div><div class="oc-desc">${o.description||''}</div>
+      <div class="oc-truth ${t.c}"><strong>${t.h}</strong>${t.b}</div>
+      <div class="oc-pills"><span class="oc-pill">Rating <b>4.9★</b></span><span class="oc-pill">🇺🇸 US Only</span>${star?'<span class="oc-pill">⭐ Hot Pick</span>':''}</div>
+      ${linked?`<a href="${o.affiliate_link}" class="oc-cta" target="_blank" rel="noopener" onclick="return handleBridgeClaimClick(event, ${o.id}, '${o.affiliate_link}')">${cta(o.tier)}</a><p class="oc-micro">Verified destination. Your reward is always free.</p>`
+              :`<button class="oc-cta dis" disabled>Coming soon</button><p class="oc-micro">Setting this up — check back shortly.</p>`}
+    </div></div>`;
+}
+function hit(id){fetch('/api/click/'+id,{method:'POST'}).catch(()=>{})}
+function initLazyImages(container) {
+  const lazyImages = container.querySelectorAll('img.lazy');
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          const realSrc = img.getAttribute('data-src');
+          if (realSrc) {
+            const tempImg = new Image();
+            tempImg.src = realSrc;
+            tempImg.onload = () => {
+              img.src = realSrc;
+              img.classList.add('loaded');
+              img.classList.remove('lazy');
+            };
+            tempImg.onerror = () => {
+              img.src = realSrc;
+              img.classList.add('loaded');
+              img.classList.remove('lazy');
+            };
+          }
+          observer.unobserve(img);
+        }
+      });
+    }, {
+      rootMargin: '120px 0px',
+      threshold: 0.1
     });
-
-    // Render cards filtered by Active Tier tab
-    function renderOffers() {
-      const container = document.getElementById('catalog-offers');
-      container.innerHTML = '';
-
-      const filtered = allOffers.filter(off => {
-        if (activeFilter === 0) return true;
-        return off.tier === activeFilter;
-      });
-
-      if (filtered.length === 0) {
-        container.innerHTML = `
-          <div style="grid-column: 1/-1; text-align:center; padding:3rem; color:var(--muted)">
-            <p>No verified promo campaigns found matching this tier filters currently.</p>
-          </div>
-        `;
-        return;
+    lazyImages.forEach(img => observer.observe(img));
+  } else {
+    lazyImages.forEach(img => {
+      const realSrc = img.getAttribute('data-src');
+      if (realSrc) {
+        img.src = realSrc;
+        img.classList.add('loaded');
+        img.classList.remove('lazy');
       }
+    });
+  }
+}
+async function load(n=3,w=900){
+  try{
+    const r=await fetch('/api/offers');if(!r.ok)throw 0;const offers=await r.json();
+    const t1=offers.filter(o=>o.tier===1),t2=offers.filter(o=>o.tier!==1);
+    let h='';
+    if(t1.length){h+='<div class="tier"><span class="tier-t">✅ Tier 1 — Real Products & Samples</span><span class="tier-p tp-green">Ships to your door</span></div><div class="grid">'+t1.map((o,i)=>card(o,i*0.06)).join('')+'</div>';}
+    if(t2.length){h+='<div class="tier"><span class="tier-t">🎯 Tier 2 — Free Sweepstake Entries</span><span class="tier-p tp-gold">Free to enter</span></div><div class="grid">'+t2.map((o,i)=>card(o,i*0.06)).join('')+'</div>';}
+    const container = document.getElementById('root');
+    container.innerHTML=h||'<p style="text-align:center;color:var(--ink2);padding:30px">No offers yet — check back soon.</p>';
+    initLazyImages(container);
+  }catch(e){
+    if(n>1){await new Promise(r=>setTimeout(r,w));return load(n-1,w*1.5);}
+    document.getElementById('root').innerHTML='<div style="text-align:center;padding:40px"><p style="color:var(--ink2);margin-bottom:14px">Couldn\'t load offers.</p><button onclick="location.reload()" style="padding:10px 24px;background:var(--grad);border:none;border-radius:100px;font-weight:600;cursor:pointer;color:#1a0a00">Reload</button></div>';
+  }
+}
 
-      filtered.forEach(item => {
-        // Find suitable Unsplash matching photo from mapping dictionary
-        const imgUrl = keywordImages[item.image_keyword] || 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?q=30&w=400&auto=format&fit=crop';
-        
-        const cardHtml = `
-          <div class="offer-card" id="offer-card-${item.id}">
-            <div class="offer-image-box">
-              <img src="${imgUrl}" alt="${item.name}" class="offer-image">
-              <span class="offer-badge">${item.badge || 'Ships Free'}</span>
-            </div>
-            <div class="offer-content">
-              <div class="offer-meta">
-                <span class="network-badge">${item.network} Verified</span>
-                <span>Type: ${item.cpa_type}</span>
-              </div>
-              <h2 class="offer-title">${item.icon} ${item.name}</h2>
-              <p class="offer-desc">${item.description}</p>
-              
-              <div class="payout-strip">
-                <span class="label">Matched EPC Tracker:</span>
-                <span class="amount">$${item.epc.toFixed(2)} Target</span>
-              </div>
+// Redirect immediately to requested pending offer link once subscription lands here
+const pendingLink = localStorage.getItem('pending_claim_link');
+const pendingId = localStorage.getItem('pending_claim_id');
+if (pendingLink) {
+  localStorage.removeItem('pending_claim_link');
+  localStorage.removeItem('pending_claim_id');
+  if (pendingId) {
+    fetch('/api/click/' + pendingId, { method: 'POST' }).catch(() => {});
+  }
+  location.href = pendingLink;
+} else {
+  load();
+}
 
-              <a href="#" onclick="claimOffer(event, ${item.id}, ${item.offer_id}, '${item.affiliate_link}')" class="claim-btn">
-                ⚡ Claim Reward Now
-              </a>
-            </div>
-          </div>
-        `;
-        container.insertAdjacentHTML('beforeend', cardHtml);
-      });
-    }
-
-    // Tab filter controller
-    function filterCatalog(tier) {
-      activeFilter = tier;
-      document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
-        if (idx === tier) {
-          btn.classList.add('active');
-        } else {
-          btn.classList.remove('active');
-        }
-      });
-      renderOffers();
-    }
-
-    // Click tracker logging handler
-    function claimOffer(e, id, offerId, linkUrl) {
-      e.preventDefault();
-
-      // Fire visual reward celebration confetti
-      confetti({
-        particleCount: 50,
-        spread: 40,
-        origin: { y: 0.8 }
-      });
-
-      // Background tracking POST query logger
-      fetch(`/api/click/${id}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      })
-      .then(() => {
-        console.log(`Click event logged in backend DB for offer ID: ${id}`);
-      })
-      .catch((err) => {
-        console.warn("Analytics ping error ignored to protect experience:", err);
-      })
-      .finally(() => {
-        // Safely redirect user to final MaxBounty destination link
-        window.open(linkUrl || 'https://www.maxbounty.com', '_blank');
-      });
-    }
-  </script>
+/* confirmed celebration */
+if(P.get('confirmed')==='1'){
+  const c=document.getElementById('celebrate');
+  if (c) {
+    c.classList.add('show');
+    const barEl = document.getElementById('bar');
+    if (barEl) barEl.style.display='flex';
+    setTimeout(()=>{c.classList.add('out');setTimeout(()=>c.remove(),700)},2600);
+  }
+}
+</script>
 </body>
 </html>
